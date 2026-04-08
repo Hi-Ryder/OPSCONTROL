@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpsControl — Morais Transportes</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif}
+:root{--blue:#2563EB;--blue-dark:#1E3A8A;--bg:#F3F4F6;--white:#FFFFFF;--green:#22C55E;--red:#EF4444;--yellow:#F59E0B;--gray:#6B7280;--gray-light:#E5E7EB;--text:#111827;--text2:#374151;--text3:#6B7280}
+body{background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+input,select,textarea{font-family:inherit;font-size:13px;border:1px solid #D1D5DB;border-radius:6px;padding:8px 10px;width:100%;outline:none;background:#fff;color:var(--text)}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(37,99,235,0.15)}
+button{font-family:inherit;font-size:13px;cursor:pointer;border:none;border-radius:6px;padding:8px 16px;transition:all .15s}
+.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:#1d4ed8}
+.btn-success{background:var(--green);color:#fff}.btn-success:hover{background:#16a34a}
+.btn-danger{background:var(--red);color:#fff}.btn-danger:hover{background:#dc2626}
+.btn-warning{background:var(--yellow);color:#fff}.btn-warning:hover{background:#d97706}
+.btn-outline{background:#fff;color:var(--blue);border:1px solid var(--blue)}.btn-outline:hover{background:#eff6ff}
+.btn-sm{padding:5px 10px;font-size:12px}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600}
+.badge-green{background:#dcfce7;color:#15803d}
+.badge-red{background:#fee2e2;color:#b91c1c}
+.badge-yellow{background:#fef3c7;color:#92400e}
+.badge-blue{background:#dbeafe;color:#1d4ed8}
+.badge-gray{background:#f3f4f6;color:#374151}
+table{width:100%;border-collapse:collapse}
+th{background:#f9fafb;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);padding:10px 12px;text-align:left;border-bottom:1px solid var(--gray-light)}
+td{padding:10px 12px;border-bottom:1px solid #f3f4f6;color:var(--text2);font-size:13px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f9fafb}
+.card{background:#fff;border-radius:10px;border:1px solid var(--gray-light);padding:20px}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:1000}
+.modal{background:#fff;border-radius:12px;padding:24px;width:90%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal-lg{max-width:700px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.alert{padding:10px 14px;border-radius:8px;font-size:13px;display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.alert-warning{background:#fef3c7;color:#92400e;border:1px solid #fde68a}
+.alert-danger{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca}
+.alert-success{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0}
+.stat-card{background:#fff;border-radius:10px;border:1px solid var(--gray-light);padding:16px}
+.stat-label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.stat-value{font-size:26px;font-weight:700;color:var(--text)}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:3px}
+.tab-bar{display:flex;gap:4px;margin-bottom:16px;background:#f3f4f6;padding:4px;border-radius:8px}
+.tab{padding:7px 14px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text3);border:none;background:transparent}
+.tab.active{background:#fff;color:var(--blue);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.section-title{font-size:16px;font-weight:700;color:var(--text)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const STATE = {
+  view: 'login', currentUser: null, activeMenu: 'dashboard', activeSubTab: '', modal: null,
+  users: [
+    {id:1,name:'Admin Sistema',email:'admin@morais.com',password:'admin123',role:'admin',active:true,createdAt:'2024-01-01'},
+    {id:2,name:'Carlos Amazon',email:'amazon@morais.com',password:'op123',role:'op_amazon',active:true,createdAt:'2024-01-01'},
+    {id:3,name:'Ana Mercado',email:'mercado@morais.com',password:'op123',role:'op_mercado',active:true,createdAt:'2024-01-01'},
+    {id:4,name:'Pedro Financeiro',email:'financeiro@morais.com',password:'op123',role:'op_financeiro',active:true,createdAt:'2024-01-01'},
+    {id:5,name:'Julia RH',email:'rh@morais.com',password:'op123',role:'op_rh',active:true,createdAt:'2024-01-01'},
+    {id:6,name:'Marcos Supervisor',email:'supervisor@morais.com',password:'op123',role:'supervisor',active:true,createdAt:'2024-01-01'},
+  ],
+  motoristas: [
+    {id:1,nome:'João Silva',telefone:'(19) 99001-2345',cidade:'Campinas',veiculo:'Furgão',pix:'joao.silva@pix',status:'ativo'},
+    {id:2,nome:'Pedro Souza',telefone:'(19) 98765-4321',cidade:'Sumaré',veiculo:'Moto',pix:'pedro.souza@pix',status:'ativo'},
+    {id:3,nome:'Maria Costa',telefone:'(11) 97654-3210',cidade:'São Paulo',veiculo:'Carro',pix:'',status:'ativo'},
+    {id:4,nome:'Lucas Lima',telefone:'(19) 96543-2109',cidade:'Indaiatuba',veiculo:'Furgão',pix:'lucas.lima@pix',status:'inativo'},
+  ],
+  cidades: [
+    {id:1,nome:'Campinas',coleta:25,entrega:30,lastmile:15},
+    {id:2,nome:'Sumaré',coleta:20,entrega:25,lastmile:12},
+    {id:3,nome:'São Paulo',coleta:35,entrega:40,lastmile:20},
+    {id:4,nome:'Indaiatuba',coleta:22,entrega:28,lastmile:13},
+  ],
+  veiculos: [
+    {id:1,tipo:'Moto',adicional:0},{id:2,tipo:'Carro',adicional:15},
+    {id:3,tipo:'Furgão',adicional:30},{id:4,tipo:'Van',adicional:50},
+  ],
+  lancamentosAmazon: [
+    {id:1,data:'2025-04-10',motorista:'João Silva',pix:'joao.silva@pix',favorecido:'João Silva',valor:5025,criadoPor:'Carlos Amazon',criadoEm:'2025-04-10',enviado:true},
+    {id:2,data:'2025-04-10',motorista:'Pedro Souza',pix:'pedro.souza@pix',favorecido:'Pedro Souza',valor:2980,criadoPor:'Carlos Amazon',criadoEm:'2025-04-10',enviado:true},
+    {id:3,data:'2025-04-03',motorista:'João Silva',pix:'joao.silva@pix',favorecido:'João Silva',valor:4335,criadoPor:'Carlos Amazon',criadoEm:'2025-04-03',enviado:true},
+  ],
+  lancamentosMercado: [
+    {id:1,data:'2025-04-10',motorista:'Maria Costa',pix:'maria.costa@pix',favorecido:'Maria Costa',valor:5125,criadoPor:'Ana Mercado',criadoEm:'2025-04-10',enviado:true},
+    {id:2,data:'2025-04-03',motorista:'João Silva',pix:'joao.silva@pix',favorecido:'João Silva',valor:3415,criadoPor:'Ana Mercado',criadoEm:'2025-04-03',enviado:true},
+  ],
+  contasPagar: [
+    {id:1,motorista:'João Silva',semana:'2025-W15',valor:5025,pix:'joao.silva@pix',status:'pendente',dataPagamento:null,pagoBy:null,origem:'amazon'},
+    {id:2,motorista:'Pedro Souza',semana:'2025-W15',valor:2980,pix:'pedro.souza@pix',status:'pendente',dataPagamento:null,pagoBy:null,origem:'amazon'},
+    {id:3,motorista:'Maria Costa',semana:'2025-W15',valor:5125,pix:'',status:'pendente',dataPagamento:null,pagoBy:null,origem:'mercado'},
+    {id:4,motorista:'João Silva',semana:'2025-W14',valor:4335,pix:'joao.silva@pix',status:'pago',dataPagamento:'2025-04-05',pagoBy:'Pedro Financeiro',origem:'amazon'},
+    {id:5,motorista:'João Silva',semana:'2025-W14',valor:3415,pix:'joao.silva@pix',status:'pago',dataPagamento:'2025-04-05',pagoBy:'Pedro Financeiro',origem:'mercado'},
+  ],
+  funcionarios: [
+    {id:1,nome:'Carlos Amazon',cargo:'Operador Amazon',salario:2800,vr:220,vt:180,pix:'carlos@pix',status:'ativo',admissao:'2023-03-01'},
+    {id:2,nome:'Ana Mercado',cargo:'Operador ML',salario:2800,vr:220,vt:180,pix:'ana@pix',status:'ativo',admissao:'2023-03-01'},
+    {id:3,nome:'Julia RH',cargo:'Analista RH',salario:3200,vr:220,vt:200,pix:'julia@pix',status:'ativo',admissao:'2022-08-15'},
+    {id:4,nome:'Pedro Financeiro',cargo:'Analista Financeiro',salario:3500,vr:220,vt:200,pix:'pedro@pix',status:'ativo',admissao:'2022-06-01'},
+  ],
+  logs: [
+    {id:1,usuario:'Carlos Amazon',acao:'Criou lançamento Amazon semana 2025-W15',data:'2025-04-10 09:23'},
+    {id:2,usuario:'Ana Mercado',acao:'Criou lançamento Mercado Livre semana 2025-W15',data:'2025-04-10 10:11'},
+    {id:3,usuario:'Pedro Financeiro',acao:'Marcou pagamento de João Silva (W14) como pago',data:'2025-04-05 14:02'},
+    {id:4,usuario:'Julia RH',acao:'Enviou folha RH março/2025 ao Financeiro',data:'2025-03-30 16:45'},
+  ],
+  loginError:'', loginEmail:'', loginPass:'', vrMesAtual:{}, descontosMesAtual:{}, folhaMesFiltro:new Date().toISOString().slice(0,7),
+};
+
+const ROLES = {
+  admin:{label:'Administrador',color:'badge-blue'},
+  op_amazon:{label:'Op. Amazon',color:'badge-blue'},
+  op_mercado:{label:'Op. Mercado Livre',color:'badge-blue'},
+  op_financeiro:{label:'Op. Financeiro',color:'badge-blue'},
+  op_rh:{label:'Op. RH',color:'badge-blue'},
+  supervisor:{label:'Supervisor',color:'badge-gray'},
+};
+
+function canAccess(menu){
+  const r=STATE.currentUser?.role;
+  if(r==='admin') return true;
+  const map={dashboard:true,amazon:r==='op_amazon',mercado:r==='op_mercado',financeiro:r==='op_financeiro',rh:r==='op_rh',cadastros:['op_amazon','op_mercado','op_financeiro','op_rh'].includes(r),relatorios:r==='supervisor',administracao:false};
+  return map[menu]||false;
+}
+function addLog(acao){STATE.logs.unshift({id:Date.now(),usuario:STATE.currentUser.name,acao,data:new Date().toLocaleString('pt-BR')});}
+function today(){return new Date().toISOString().split('T')[0];}
+function semanaAtual(){const d=new Date(),y=d.getFullYear(),start=new Date(y,0,1),w=Math.ceil((((d-start)/86400000)+start.getDay()+1)/7);return `${y}-W${String(w).padStart(2,'0')}`;}
+function calcValor(cidade,veiculo,coletas,entregas,lastmile){const c=STATE.cidades.find(x=>x.nome===cidade)||{coleta:20,entrega:25,lastmile:12};const v=STATE.veiculos.find(x=>x.tipo===veiculo)||{adicional:0};return coletas*c.coleta+entregas*c.entrega+lastmile*c.lastmile+v.adicional;}
+function render(){document.getElementById('app').innerHTML=buildHTML();attachEvents();}
+function buildHTML(){return STATE.view==='login'?buildLogin():buildApp();}
+
+function buildLogin(){
+  return `<div style="display:flex;height:100vh">
+    <div style="flex:1;background:linear-gradient(135deg,#1E3A8A,#2563EB);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px">
+      <div style="color:#fff;text-align:center">
+        <div style="font-size:52px;font-weight:800;letter-spacing:-2px;margin-bottom:14px">OpsControl</div>
+        <div style="font-size:17px;opacity:.85;max-width:300px;line-height:1.7">Sistema de Gestão de Operações Logísticas</div>
+        <div style="margin-top:48px;display:flex;flex-direction:column;gap:14px;font-size:14px;opacity:.75">
+          <div>&#10003; Controle Amazon &amp; Mercado Livre</div>
+          <div>&#10003; Gestão Financeira e RH</div>
+          <div>&#10003; Relatórios e Indicadores</div>
+        </div>
+        <div style="margin-top:60px;font-size:13px;opacity:.5;border-top:1px solid rgba(255,255,255,.2);padding-top:20px">Morais Transportes &copy; 2025</div>
+      </div>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:40px;background:#fff">
+      <div style="width:100%;max-width:380px">
+        <h2 style="font-size:24px;font-weight:700;margin-bottom:6px">Entrar no sistema</h2>
+        <p style="color:var(--text3);font-size:13px;margin-bottom:28px">Acesso restrito a usuários autorizados</p>
+        ${STATE.loginError?`<div class="alert alert-danger"><span>&#9888;</span>${STATE.loginError}</div>`:''}
+        <div class="form-group"><label>E-mail</label><input id="loginEmail" type="text" placeholder="seu@email.com" value="${STATE.loginEmail}"></div>
+        <div class="form-group"><label>Senha</label><input id="loginPass" type="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" value="${STATE.loginPass}"></div>
+        <button class="btn-primary" id="btnLogin" style="width:100%;padding:12px;font-size:15px;font-weight:600;margin-top:8px">Entrar</button>
+        <p style="margin-top:20px;font-size:12px;color:var(--text3);text-align:center">Esqueceu sua senha? Contate o administrador.</p>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildApp(){
+  const day=new Date().getDate();
+  const pendentes=STATE.contasPagar.filter(c=>c.status==='pendente');
+  const semPix=STATE.motoristas.filter(m=>m.status==='ativo'&&!m.pix);
+  const alerts=[];
+  if(day===30&&['op_rh','admin'].includes(STATE.currentUser.role)) alerts.push({type:'warning',msg:'Hoje é dia 30 — feche e envie a folha de pagamento!'});
+  if(pendentes.length>0&&['op_financeiro','admin'].includes(STATE.currentUser.role)) alerts.push({type:'warning',msg:`${pendentes.length} pagamento(s) pendentes aguardando.`});
+  if(semPix.length>0&&['admin','op_financeiro'].includes(STATE.currentUser.role)) alerts.push({type:'danger',msg:`${semPix.length} motorista(s) sem chave PIX cadastrada.`});
+  const menus=[
+    {id:'dashboard',icon:'&#9638;',label:'Dashboard'},
+    {id:'amazon',icon:'&#9672;',label:'Amazon'},
+    {id:'mercado',icon:'&#9673;',label:'Mercado Livre'},
+    {id:'rh',icon:'&#9678;',label:'RH'},
+    {id:'financeiro',icon:'&#9670;',label:'Financeiro'},
+    {id:'cadastros',icon:'&#9643;',label:'Cadastros'},
+    {id:'relatorios',icon:'&#9636;',label:'Relatórios'},
+    {id:'administracao',icon:'&#9677;',label:'Administração'},
+  ].filter(m=>canAccess(m.id));
+  return `<div style="display:flex;height:100vh;overflow:hidden">
+    <div style="width:230px;background:#1E3A8A;display:flex;flex-direction:column;flex-shrink:0">
+      <div style="padding:22px 18px;border-bottom:1px solid rgba(255,255,255,.1)">
+        <div style="color:#fff;font-size:22px;font-weight:800">OpsControl</div>
+        <div style="color:rgba(255,255,255,.55);font-size:11px;margin-top:2px">Morais Transportes</div>
+      </div>
+      <div style="flex:1;padding:12px 8px;overflow-y:auto">
+        ${menus.map(m=>`<button class="nav-item${STATE.activeMenu===m.id?' active':''}" data-menu="${m.id}" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:8px;border:none;background:${STATE.activeMenu===m.id?'rgba(255,255,255,.15)':'transparent'};color:${STATE.activeMenu===m.id?'#fff':'rgba(255,255,255,.65)'};cursor:pointer;font-size:13px;font-weight:500;text-align:left;margin-bottom:2px">${m.icon} ${m.label}</button>`).join('')}
+      </div>
+      <div style="padding:14px;border-top:1px solid rgba(255,255,255,.1)">
+        <div style="color:rgba(255,255,255,.9);font-size:13px;font-weight:600;padding:4px 12px">${STATE.currentUser.name}</div>
+        <div style="color:rgba(255,255,255,.5);font-size:11px;padding:0 12px 8px">${ROLES[STATE.currentUser.role]?.label}</div>
+        <button id="btnLogout" style="width:100%;padding:8px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:none;border-radius:6px;cursor:pointer;font-size:12px">Sair do sistema</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;background:var(--bg)">
+      <div style="padding:24px 28px">
+        ${alerts.map(a=>`<div class="alert alert-${a.type}">${a.type==='warning'?'&#9888;':'&#10005;'} ${a.msg}</div>`).join('')}
+        ${buildSection()}
+      </div>
+    </div>
+    ${STATE.modal?buildModal():''}
+  </div>`;
+}
+
+function buildSection(){
+  switch(STATE.activeMenu){
+    case 'dashboard': return buildDashboard();
+    case 'amazon': return buildLancamentos('amazon');
+    case 'mercado': return buildLancamentos('mercado');
+    case 'financeiro': return buildFinanceiro();
+    case 'rh': return buildRH();
+    case 'cadastros': return buildCadastros();
+    case 'relatorios': return buildRelatorios();
+    case 'administracao': return buildAdministracao();
+    default: return '<p>Módulo em desenvolvimento</p>';
+  }
+}
+
+function buildDashboard(){
+  const all=[...STATE.lancamentosAmazon,...STATE.lancamentosMercado];
+  const totalValor=all.reduce((s,l)=>s+l.valor,0);
+  const pendentes=STATE.contasPagar.filter(c=>c.status==='pendente');
+  const pagos=STATE.contasPagar.filter(c=>c.status==='pago');
+  const totalPend=pendentes.reduce((s,c)=>s+c.valor,0);
+  const totalPago=pagos.reduce((s,c)=>s+c.valor,0);
+  return `<div>
+    <div style="margin-bottom:22px"><h2 style="font-size:22px;font-weight:700">Dashboard de Valores</h2><p style="color:var(--text3);font-size:13px">Resumo rápido</p></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px">
+      <div class="stat-card"><div class="stat-label">Valor Total Operado (Histórico)</div><div class="stat-value" style="font-size:20px;color:var(--blue)">R$ ${totalValor.toLocaleString('pt-BR')}</div></div>
+      <div class="stat-card"><div class="stat-label">Pagamentos Pendentes</div><div class="stat-value" style="color:var(--red);font-size:20px">R$ ${totalPend.toLocaleString('pt-BR')}</div><div class="stat-sub">${pendentes.length} registro(s)</div></div>
+      <div class="stat-card"><div class="stat-label">Pagamentos Realizados</div><div class="stat-value" style="color:var(--green);font-size:20px">R$ ${totalPago.toLocaleString('pt-BR')}</div><div class="stat-sub">${pagos.length} registro(s)</div></div>
+    </div>
+  </div>`;
+}
+
+function buildLancamentos(tipo){
+  const tab = STATE.activeSubTab||'locais';
+  const listaCompleta=tipo==='amazon'?STATE.lancamentosAmazon:STATE.lancamentosMercado;
+  const titulo=tipo==='amazon'?'Amazon':'Mercado Livre';
+  const podeEnviar=['admin','supervisor'].includes(STATE.currentUser.role);
+  
+  const pendentes=listaCompleta.filter(x=>!x.enviado);
+  const historico=listaCompleta.filter(x=>x.enviado);
+  const exibe = tab==='locais'?pendentes:historico;
+
+  return `<div>
+    <div class="section-header">
+      <div><h2 style="font-size:20px;font-weight:700">Operações ${titulo}</h2><p style="color:var(--text3);font-size:13px">Lançamentos Locais e Histórico Enviado</p></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-success" id="btnEnviarFinOp" data-tipo="${tipo}" ${podeEnviar&&pendentes.length>0?'':'disabled'} style="${podeEnviar&&pendentes.length>0?'':'opacity:0.5'}">Enviar ${pendentes.length} ao Financeiro</button>
+        <button class="btn-outline" id="btnLoteLanc" data-tipo="${tipo}">+ Colar em Lote</button>
+        <button class="btn-primary" id="btnNovoLanc" data-tipo="${tipo}">+ Lançamento Único</button>
+      </div>
+    </div>
+    
+    <div class="tab-bar">
+      <button class="tab${tab==='locais'?' active':''}" data-subtab="locais">Mesa de Operação (${pendentes.length})</button>
+      <button class="tab${tab==='historico'?' active':''}" data-subtab="historico">Histórico (${historico.length})</button>
+    </div>
+
+    <div class="card">
+      ${tab==='locais' && !podeEnviar ? `<div style="margin-bottom:12px;font-size:12px;color:var(--text3)">❌ O envio de aprovação final de custos deve ser feito pelo supervisor. Até lá seus lançamentos estarão restritos a visualização local.</div>` : ''}
+      <table>
+        <thead><tr><th>Data</th><th>Motorista</th><th>Chave PIX</th><th>Favorecido</th><th>Valor Fechado</th><th>Criado por</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          ${exibe.length===0?'<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:20px">Nenhum registro nesta aba</td></tr>':''}
+          ${exibe.map(l=>{
+             let statusHTML = '<span class="badge badge-yellow">Mesa de Operação</span>';
+             if(l.enviado){
+                // Fazemos o link para saber o status no Caixa Financeiro
+                const c = STATE.contasPagar.find(x => (l.contaId && x.id === l.contaId) || (!l.contaId && x.motorista === l.motorista && x.valor === l.valor && x.origem === tipo));
+                if(c && c.status === 'pago') statusHTML = '<span class="badge badge-green">✔ Liquidado (Pago)</span>';
+                else statusHTML = '<span class="badge badge-yellow" style="background:#fef08a;color:#854d0e">Aguardando Financeiro</span>';
+             }
+             return `<tr>
+              <td><span class="badge badge-blue">${l.data}</span></td>
+              <td style="font-weight:500">${l.motorista}</td><td style="font-family:monospace;font-size:12px">${l.pix}</td><td>${l.favorecido}</td>
+              <td style="font-weight:600;color:var(--blue)">R$ ${l.valor.toLocaleString('pt-BR')}</td>
+              <td style="color:var(--text3);font-size:12px">${l.criadoPor}</td>
+              <td>${statusHTML}</td>
+              <td>${l.enviado?'':'<button class="btn-sm btn-outline" data-del-lanc="'+l.id+'" data-tipo="'+tipo+'">Excluir</button>'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function buildFinanceiro(){
+  const tab=STATE.activeSubTab||'pagar';
+  const pendentes=STATE.contasPagar.filter(c=>c.status==='pendente');
+  const pagos=STATE.contasPagar.filter(c=>c.status==='pago');
+  return `<div>
+    <div class="section-header"><div><h2 style="font-size:20px;font-weight:700">Financeiro</h2><p style="color:var(--text3);font-size:13px">Contas a pagar e pagamentos realizados</p></div></div>
+    <div class="tab-bar">
+      <button class="tab${tab==='pagar'?' active':''}" data-subtab="pagar">Contas a Pagar (${pendentes.length})</button>
+      <button class="tab${tab==='pago'?' active':''}" data-subtab="pago">Realizados (${pagos.length})</button>
+    </div>
+    ${tab==='pagar'?`<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-size:12px;color:var(--text3)">Selecione os pagamentos que deseja liquidar em lote.</div>
+        <button class="btn-success btn-sm" id="btnPagarMarcados" style="display:none">✔ Realizar Pagamento do Lote Selecionado</button>
+      </div>
+      <table>
+      <thead><tr><th style="width:40px"><input type="checkbox" id="chkAllFin" style="transform:scale(1.1)"></th><th>Beneficiário</th><th>Semana/Mês</th><th>Origem</th><th>Valor</th><th>Chave PIX / Boleto</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        ${pendentes.length===0?'<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:20px">Nenhuma conta pendente</td></tr>':''}
+        ${pendentes.map(c=>`<tr>
+          <td><input type="checkbox" class="chk-fin" data-id="${c.id}" style="transform:scale(1.1)"></td>
+          <td style="font-weight:500">${c.motorista}</td><td>${c.semana}</td>
+          <td><span class="badge ${c.origem==='amazon'?'badge-blue':c.origem==='rh'?'badge-gray':c.origem==='rh_vr'?'badge-green':'badge-yellow'}">${c.origem==='amazon'?'Amazon':c.origem==='rh'?'RH Folha':c.origem==='rh_vr'?'RH VR':'Mercado Livre'}</span></td>
+          <td style="font-weight:600;color:var(--blue)">R$ ${c.valor.toLocaleString('pt-BR')}</td>
+          <td>${c.pix?`<span style="font-family:monospace;font-size:12px">${c.pix}</span>`:'<span class="badge badge-red">Pendente</span>'}</td>
+          <td><span class="badge badge-yellow">Pendente</span></td>
+          <td><button class="btn-sm btn-success" data-pagar="${c.id}">Pagar Único</button></td>
+        </tr>`).join('')}
+      </tbody></table></div>`
+    :`<div class="card"><table>
+      <thead><tr><th>Beneficiário</th><th>Semana/Mês</th><th>Origem</th><th>Valor</th><th>PIX / Boleto</th><th>Data Pgto</th><th>Pago por</th></tr></thead>
+      <tbody>
+        ${pagos.length===0?'<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:20px">Nenhum pagamento realizado</td></tr>':''}
+        ${pagos.map(c=>`<tr>
+          <td style="font-weight:500">${c.motorista}</td><td>${c.semana}</td>
+          <td><span class="badge ${c.origem==='amazon'?'badge-blue':c.origem==='rh'?'badge-gray':c.origem==='rh_vr'?'badge-green':'badge-yellow'}">${c.origem==='amazon'?'Amazon':c.origem==='rh'?'RH Folha':c.origem==='rh_vr'?'RH VR':'Mercado Livre'}</span></td>
+          <td style="font-weight:600;color:var(--green)">R$ ${c.valor.toLocaleString('pt-BR')}</td>
+          <td style="font-family:monospace;font-size:12px">${c.pix||'-'}</td>
+          <td>${c.dataPagamento||'-'}</td>
+          <td style="font-size:12px;color:var(--text3)">${c.pagoBy||'-'}</td>
+        </tr>`).join('')}
+      </tbody></table></div>`}
+  </div>`;
+}
+
+function buildRH(){
+  const tab=STATE.activeSubTab||'funcionarios';
+  const hoje=new Date().getDate();
+  const fAtivos = STATE.funcionarios.filter(f=>f.status==='ativo');
+  const vrTotal = fAtivos.reduce((s,f)=>s+Number(STATE.vrMesAtual[f.id]||0),0);
+  return `<div>
+    <div class="section-header">
+      <div>
+        <h2 style="font-size:20px;font-weight:700">Recursos Humanos</h2>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:2px">
+          <p style="color:var(--text3);font-size:13px">Gestão global — Mês de Referência:</p>
+          <input type="month" id="fFiltroMes" value="${STATE.folhaMesFiltro}" style="width:130px;padding:2px 4px;font-size:12px;border:1px solid #d1d5db;border-radius:4px" ${tab==='funcionarios'?'disabled':''}>
+        </div>
+      </div>
+      ${tab==='funcionarios'?'<button class="btn-primary" id="btnNovoFunc">+ Novo Funcionário</button>':''}
+    </div>
+    ${hoje===30?'<div class="alert alert-warning">&#9888; <strong>Atenção:</strong> Hoje é dia 30 — feche a folha de pagamento!</div>':''}
+    <div class="tab-bar">
+      <button class="tab${tab==='funcionarios'?' active':''}" data-subtab="funcionarios">Funcionários</button>
+      <button class="tab${tab==='folha'?' active':''}" data-subtab="folha">Folha Mensal</button>
+      <button class="tab${tab==='vr'?' active':''}" data-subtab="vr">Gestão VR</button>
+    </div>
+    ${tab==='funcionarios'?`<div class="card"><table>
+      <thead><tr><th>Nome</th><th>Cargo</th><th>Salário Base</th><th>VT</th><th>Total (sem VR)</th><th>PIX</th><th>Admissão</th><th>Status</th><th></th></tr></thead>
+      <tbody>${STATE.funcionarios.map(f=>`<tr>
+        <td style="font-weight:500">${f.nome}</td><td>${f.cargo}</td>
+        <td>R$ ${f.salario.toLocaleString('pt-BR')}</td><td>R$ ${f.vt}</td>
+        <td style="font-weight:600;color:var(--blue)">R$ ${(f.salario+f.vt).toLocaleString('pt-BR')}</td>
+        <td style="font-family:monospace;font-size:12px">${f.pix||'-'}</td>
+        <td style="font-size:12px">${f.admissao}</td>
+        <td><span class="badge ${f.status==='ativo'?'badge-green':'badge-gray'}">${f.status}</span></td>
+        <td><button class="btn-sm btn-outline" data-edit-func="${f.id}">Editar</button></td>
+      </tr>`).join('')}</tbody></table></div>`
+    :tab==='folha'?`<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div><div style="font-size:15px;font-weight:600">Folha de Pagamento</div><div style="font-size:12px;color:var(--text3)">Confira a folha, aplique descontos e envie ao Financeiro.</div></div>
+        <button class="btn-primary" id="btnEnviarFolha">Enviar Selecionados / Salvar</button>
+      </div>
+      <table>
+        <thead><tr><th>Funcionário</th><th>Cargo</th><th>Salário</th><th>VT</th><th>Desconto (R$)</th><th>Total Líquido</th><th>Status</th></tr></thead>
+        <tbody>
+          ${fAtivos.map(f=>{
+            const ext=STATE.contasPagar.find(c=>c.motorista===f.nome&&c.semana===STATE.folhaMesFiltro&&c.origem==='rh');
+            let badge='<span class="badge badge-yellow">Pendente</span>';
+            if(ext){ badge=ext.status==='pago'?'<span class="badge badge-green">Pago</span>':'<span class="badge badge-blue">Enviado</span>'; }
+            return `<tr>
+              <td style="font-weight:500">${f.nome}</td><td>${f.cargo}</td>
+              <td>R$ ${f.salario.toLocaleString('pt-BR')}</td><td>R$ ${f.vt}</td>
+              <td><input type="number" class="desc-input" data-id="${f.id}" value="${STATE.descontosMesAtual[f.id]||''}" placeholder="Ex: 50" style="width:100px;padding:6px;font-size:13px"${ext?' disabled':''}></td>
+              <td style="font-weight:600;color:var(--blue)">R$ ${(f.salario+f.vt-Number(STATE.descontosMesAtual[f.id]||0)).toLocaleString('pt-BR')}</td>
+              <td>${badge}</td>
+            </tr>`
+          }).join('')}
+          <tr style="background:#f9fafb">
+            <td colspan="5" style="text-align:right;font-weight:700">Total Geral (Líquido):</td>
+            <td style="font-weight:700;color:var(--blue)">R$ ${fAtivos.reduce((s,f)=>s+f.salario+f.vt-Number(STATE.descontosMesAtual[f.id]||0),0).toLocaleString('pt-BR')}</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>`
+    :`<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div><div style="font-size:15px;font-weight:600">Gestão de Vale Refeição (VR)</div><div style="font-size:12px;color:var(--text3)">Total a ser enviado para ${STATE.folhaMesFiltro}</div></div>
+        ${(()=>{
+          const extVR=STATE.contasPagar.find(c=>c.motorista==='iFood (VR)'&&c.semana===STATE.folhaMesFiltro&&c.origem==='rh_vr');
+          if(extVR) return extVR.status==='pago'?'<span class="badge badge-green">Neste mês: PAGO</span>':'<span class="badge badge-blue">Neste mês: ENVIADO AO FINANC.</span>';
+          return vrTotal>0?`<button class="btn-success" id="btnEnviarVR">Enviar Total: R$ ${vrTotal.toLocaleString('pt-BR')}</button>`:'';
+        })()}
+      </div>
+      <table style="width:100%;max-width:500px">
+        <thead><tr><th>Funcionário</th><th>Valor VR (R$)</th></tr></thead>
+        <tbody>
+          ${(()=>{
+            const extVR=STATE.contasPagar.find(c=>c.motorista==='iFood (VR)'&&c.semana===STATE.folhaMesFiltro&&c.origem==='rh_vr');
+            return fAtivos.map(f=>`<tr>
+              <td style="font-weight:500">${f.nome}</td>
+              <td><input type="number" class="vr-input" data-id="${f.id}" value="${STATE.vrMesAtual[f.id]||''}" placeholder="Ex: 500" style="width:120px;padding:6px;font-size:13px"${extVR?' disabled':''}></td>
+            </tr>`).join('')
+          })()}
+          <tr style="background:#f9fafb">
+            <td style="text-align:right;font-weight:700">Total iFood:</td>
+            <td style="font-weight:700;color:var(--blue)">R$ ${vrTotal.toLocaleString('pt-BR')}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>`}
+  </div>`;
+}
+
+function buildCadastros(){
+  const tab=STATE.activeSubTab||'motoristas';
+  return `<div>
+    <div class="section-header">
+      <div><h2 style="font-size:20px;font-weight:700">Cadastros</h2><p style="color:var(--text3);font-size:13px">Motoristas, cidades e veículos</p></div>
+      <button class="btn-primary" id="btnNovoCad" data-tipo="${tab}">+ Novo</button>
+    </div>
+    <div class="tab-bar">
+      <button class="tab${tab==='motoristas'?' active':''}" data-subtab="motoristas">Motoristas</button>
+      <button class="tab${tab==='cidades'?' active':''}" data-subtab="cidades">Cidades</button>
+      <button class="tab${tab==='veiculos'?' active':''}" data-subtab="veiculos">Veículos</button>
+    </div>
+    ${tab==='motoristas'?`<div class="card"><table>
+      <thead><tr><th>Nome</th><th>Telefone</th><th>Cidade Base</th><th>Veículo</th><th>Chave PIX</th><th>Status</th><th></th></tr></thead>
+      <tbody>${STATE.motoristas.map(m=>`<tr>
+        <td style="font-weight:500">${m.nome}</td><td>${m.telefone}</td><td>${m.cidade}</td><td>${m.veiculo}</td>
+        <td>${m.pix?`<span style="font-family:monospace;font-size:12px">${m.pix}</span>`:'<span class="badge badge-red">Não cadastrada</span>'}</td>
+        <td><span class="badge ${m.status==='ativo'?'badge-green':'badge-gray'}">${m.status}</span></td>
+        <td><button class="btn-sm btn-outline" data-edit-mot="${m.id}">Editar</button></td>
+      </tr>`).join('')}</tbody></table></div>`
+    :tab==='cidades'?`<div class="card"><table>
+      <thead><tr><th>Cidade</th><th>Valor Coleta</th><th>Valor Entrega</th><th>Valor Last Mile</th><th></th></tr></thead>
+      <tbody>${STATE.cidades.map(c=>`<tr>
+        <td style="font-weight:500">${c.nome}</td><td>R$ ${c.coleta}</td><td>R$ ${c.entrega}</td><td>R$ ${c.lastmile}</td>
+        <td><button class="btn-sm btn-outline" data-edit-cid="${c.id}">Editar</button></td>
+      </tr>`).join('')}</tbody></table></div>`
+    :`<div class="card"><table>
+      <thead><tr><th>Tipo de Veículo</th><th>Valor Adicional</th><th></th></tr></thead>
+      <tbody>${STATE.veiculos.map(v=>`<tr>
+        <td style="font-weight:500">${v.tipo}</td><td>R$ ${v.adicional}</td>
+        <td><button class="btn-sm btn-outline" data-edit-vei="${v.id}">Editar</button></td>
+      </tr>`).join('')}</tbody></table></div>`}
+  </div>`;
+}
+
+function buildRelatorios(){
+  const tab=STATE.activeSubTab||'producao';
+  const allLanc=[...STATE.lancamentosAmazon,...STATE.lancamentosMercado];
+  const porMot={};
+  allLanc.forEach(l=>{if(!porMot[l.motorista])porMot[l.motorista]={valor:0, qtd:0};porMot[l.motorista].valor+=l.valor;porMot[l.motorista].qtd+=1;});
+  return `<div>
+    <div class="section-header">
+      <div><h2 style="font-size:20px;font-weight:700">Relatórios</h2></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-outline btn-sm" id="btnExportProd">&#8595; Produção CSV</button>
+        <button class="btn-outline btn-sm" id="btnExportFin">&#8595; Financeiro CSV</button>
+        <button class="btn-outline btn-sm" id="btnExportRH">&#8595; Folha RH CSV</button>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab${tab==='producao'?' active':''}" data-subtab="producao">Histórico Lançamentos</button>
+      <button class="tab${tab==='financeiro'?' active':''}" data-subtab="financeiro">Financeiro</button>
+      <button class="tab${tab==='rh'?' active':''}" data-subtab="rh">RH</button>
+    </div>
+    ${tab==='producao'?`<div class="card">
+      <div style="font-size:14px;font-weight:600;margin-bottom:14px">Valores acumulados por motorista</div>
+      <table><thead><tr><th>Motorista</th><th>Nº Lançamentos Realizados</th><th>Valor Total Consolidado</th></tr></thead>
+      <tbody>${Object.entries(porMot).map(([nome,d])=>`<tr>
+        <td style="font-weight:500">${nome}</td><td style="text-align:center">${d.qtd} vez(es)</td>
+        <td style="font-weight:600;color:var(--blue)">R$ ${d.valor.toLocaleString('pt-BR')}</td>
+      </tr>`).join('')}</tbody></table></div>`
+    :tab==='financeiro'?`<div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px">
+        <div class="stat-card"><div class="stat-label">Total Pago</div><div class="stat-value" style="color:var(--green);font-size:22px">R$ ${STATE.contasPagar.filter(c=>c.status==='pago').reduce((s,c)=>s+c.valor,0).toLocaleString('pt-BR')}</div></div>
+        <div class="stat-card"><div class="stat-label">Total Pendente</div><div class="stat-value" style="color:var(--red);font-size:22px">R$ ${STATE.contasPagar.filter(c=>c.status==='pendente').reduce((s,c)=>s+c.valor,0).toLocaleString('pt-BR')}</div></div>
+        <div class="stat-card"><div class="stat-label">Total Geral de Transações</div><div class="stat-value" style="font-size:22px">R$ ${STATE.contasPagar.reduce((s,c)=>s+c.valor,0).toLocaleString('pt-BR')}</div></div>
+      </div></div>`
+    :`<div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+        <div class="stat-card"><div class="stat-label">Custo Mensal Total (S/ VR)</div><div class="stat-value" style="color:var(--blue);font-size:22px">R$ ${STATE.funcionarios.filter(f=>f.status==='ativo').reduce((s,f)=>s+f.salario+f.vt,0).toLocaleString('pt-BR')}</div></div>
+        <div class="stat-card"><div class="stat-label">Funcionários Ativos</div><div class="stat-value">${STATE.funcionarios.filter(f=>f.status==='ativo').length}</div></div>
+      </div>
+      <div class="card"><table>
+        <thead><tr><th>Funcionário</th><th>Cargo</th><th>Salário</th><th>VT</th><th>Total Mensal (S/ VR)</th></tr></thead>
+        <tbody>${STATE.funcionarios.filter(f=>f.status==='ativo').map(f=>`<tr>
+          <td style="font-weight:500">${f.nome}</td><td>${f.cargo}</td>
+          <td>R$ ${f.salario.toLocaleString('pt-BR')}</td><td>R$ ${(f.vt).toLocaleString('pt-BR')}</td>
+          <td style="font-weight:600;color:var(--blue)">R$ ${(f.salario+f.vt).toLocaleString('pt-BR')}</td>
+        </tr>`).join('')}</tbody></table></div></div>`}
+  </div>`;
+}
+
+function buildAdministracao(){
+  const tab=STATE.activeSubTab||'usuarios';
+  return `<div>
+    <div class="section-header">
+      <div><h2 style="font-size:20px;font-weight:700">Administração</h2><p style="color:var(--text3);font-size:13px">Usuários, permissões e log</p></div>
+      ${tab==='usuarios'?'<button class="btn-primary" id="btnNovoUser">+ Novo Usuário</button>':''}
+    </div>
+    <div class="tab-bar">
+      <button class="tab${tab==='usuarios'?' active':''}" data-subtab="usuarios">Usuários</button>
+      <button class="tab${tab==='logs'?' active':''}" data-subtab="logs">Log de Ações</button>
+    </div>
+    ${tab==='usuarios'?`<div class="card"><table>
+      <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Status</th><th>Cadastrado em</th><th></th></tr></thead>
+      <tbody>${STATE.users.map(u=>`<tr>
+        <td style="font-weight:500">${u.name}</td><td style="font-size:12px">${u.email}</td>
+        <td><span class="badge ${ROLES[u.role]?.color||'badge-gray'}">${ROLES[u.role]?.label||u.role}</span></td>
+        <td><span class="badge ${u.active?'badge-green':'badge-gray'}">${u.active?'Ativo':'Inativo'}</span></td>
+        <td style="font-size:12px;color:var(--text3)">${u.createdAt}</td>
+        <td style="display:flex;gap:6px">
+          <button class="btn-sm btn-outline" data-edit-user="${u.id}">Editar</button>
+          <button class="btn-sm btn-warning" data-reset-pass="${u.id}">Resetar Senha</button>
+        </td>
+      </tr>`).join('')}</tbody></table></div>`
+    :`<div class="card"><table>
+      <thead><tr><th>Data/Hora</th><th>Usuário</th><th>Ação</th></tr></thead>
+      <tbody>${STATE.logs.map(l=>`<tr>
+        <td style="font-size:12px;color:var(--text3);white-space:nowrap">${l.data}</td>
+        <td style="font-weight:500;white-space:nowrap">${l.usuario}</td>
+        <td>${l.acao}</td>
+      </tr>`).join('')}</tbody></table></div>`}
+  </div>`;
+}
+
+function buildModal(){
+  const m=STATE.modal;if(!m) return '';let content='';
+
+  if(m.type==='novoLanc'){
+    content=`<h3 style="font-size:16px;font-weight:700;margin-bottom:18px">Lançamento Individual — ${m.tipo==='amazon'?'Amazon':'Mercado Livre'}</h3>
+      <div class="form-row">
+        <div class="form-group"><label>Data da Operação</label><input type="date" id="fDataOp" value="${today()}"></div>
+        <div class="form-group"><label>Motorista</label><select id="fMotoristaTop"><option value="">Selecione</option>${STATE.motoristas.filter(x=>x.status==='ativo').map(x=>`<option value="${x.nome}">${x.nome}</option>`).join('')}</select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Chave PIX Carregada</label><input id="fPixAssoc" placeholder="PIX Automático"></div>
+        <div class="form-group"><label>Nome do Favorecido</label><input id="fFavAssoc" placeholder="Favorecido da Conta"></div>
+      </div>
+      <div class="form-group"><label>Valor Total do Custo (R$)</label><input type="number" id="fValorLivre" placeholder="Ex: 120.50"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+        <button class="btn-outline" id="btnCancelModal">Cancelar</button>
+        <button class="btn-primary" id="btnSalvarUnico">Salvar Lançamento</button>
+      </div>`;
+  }
+  if(m.type==='loteLanc'){
+    content=`<h3 style="font-size:16px;font-weight:700;margin-bottom:6px">Envio em Massa — ${m.tipo==='amazon'?'Amazon':'Mercado Livre'}</h3>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Cole os dados copiados de uma planilha. O formato esperado é: <strong>[Nome] [Espaço ou Tab] [Valor R$]</strong>.<br>O sistema tentará reconhecer o Motorista pelo nome cadastrado e puxará a chave PIX automaticamente.</p>
+      <div class="form-group">
+        <label>Data base para todos as transações deste lote</label>
+        <input type="date" id="fDataLote" value="${today()}" style="margin-bottom:10px">
+        <label>Cole aqui o conteúdo</label>
+        <textarea id="fAreaLote" rows="10" placeholder="João Silva    150.00&#10;Maria Costa    240.80" style="font-family:monospace;line-height:1.4"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+        <button class="btn-outline" id="btnCancelModal">Cancelar</button>
+        <button class="btn-success" id="btnProcessarLote">Processar Lote e Enviar PIX</button>
+      </div>`;
+  }
+  if(m.type==='novoMotorista'||m.type==='editMotorista'){
+    const d=m.data||{nome:'',telefone:'',cidade:'',veiculo:'Moto',pix:'',status:'ativo'};
+    content=`<h3 style="font-size:16px;font-weight:700;margin-bottom:18px">${m.type==='novoMotorista'?'Novo Motorista':'Editar Motorista'}</h3>
+      <div class="form-group"><label>Nome Completo</label><input id="fNome" value="${d.nome}"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Telefone</label><input id="fTel" value="${d.telefone}"></div>
+        <div class="form-group"><label>Cidade Base</label><select id="fCidadeBase">${STATE.cidades.map(c=>`<option${d.cidade===c.nome?' selected':''}>${c.nome}</option>`).join('')}</select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Veículo Padrão</label><select id="fVeiculoPad">${STATE.veiculos.map(v=>`<option${d.veiculo===v.tipo?' selected':''}>${v.tipo}</option>`).join('')}</select></div>
+        <div class="form-group"><label>Status</label><select id="fStatus"><option value="ativo"${d.status==='ativo'?' selected':''}>Ativo</option><option value="inativo"${d.status==='inativo'?' selected':''}>Inativo</option></select></div>
+      </div>
+      <div class="form-group"><label>Chave PIX</label><input id="fPix" value="${d.pix}" placeholder="CPF, e-mail, telefone ou chave aleatória"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+        <button class="btn-outline" id="btnCancelModal">Cancelar</button>
+        <button class="btn-primary" id="btnSalvarMot">Salvar</button>
+      </div>`;
+  }
+  if(m.type==='novoCidade'||m.type==='editCidade'){
+    const d=m.data||{nome:'',coleta:0,entrega:0,lastmile:0};
+    content=`<h3 style="font-size:16px;font-weight:700;margin-bottom:18px">${m.type==='novoCidade'?'Nova Cidade':'Editar Cidade'}</h3>
+      <div class="form-group"><label>Nome da Cidade</label><input id="fNomeCid" value="${d.nome}"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Valor Coleta (R$)</label><input id="fVColeta" type="number" value="${d.coleta}"></div>
+        <div class="form-group"><label>Valor Entrega (R$)</label><input id="fVEntrega" type="number" value="${d.entrega}"></div>
+      </div>
+      <div class="form-group"><label>Valor Last Mile (R$)</label><input id="fVLM" type="number" value="${d.lastmile}"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+        <button class="btn-outline" id="btnCancelModal">Cancelar</button>
+        <button class="btn-primary" id="btnSalvarCid">Salvar</button>
+      </div>`;
+  }
+  if(m.type==='novoVeiculo'||m.type==='editVeiculo'){
+    const d=m.data||{tipo:'',adicional:0};
+    content=`<h3 style="font-size:16px;font-weight:700;margin-bottom:18px">${m.type==='novoVeiculo'?'Novo Veículo':'Editar Veículo'}</h3>
+      <div class="form-group"><label>Tipo de Veículo</label><input id="fTipoVei" value="${d.tipo}"></div>
+      <div class="form-group"><label>Valor Adicional (R$)</label><input id="fAdicional" type="number" value="${d.adicional}"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+        <button class="btn-outline" id="btnCancelModal">Cancelar</button>
+        <button class="btn-primary" id="btnSalvarVei">Salvar</button>
+      </div>`;
+  }
+  if(m.type==='novoUser'||m.type==='editUser'){
+    const d=m.data||{name:'',email:'',password:'',role:'op_amazon',active:true};
+    content=`<h3 style="font-size:16px;font-weight:700;margin-bottom:18px">${m.type==='novoUser'?'Novo Usuário':'Editar Usuário'}</h3>
+      <div class="form-row">
+        <div class="form-group"><label>Nome Completo</label><input id="fUserName" value="${d.name}"></div>
+        <div class="form-group"><label>E-mail</label><input id="fUserEmail" type="email" value="${d.email}"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Senha${m.type==='editUser'?' (branco = não alterar)':''}</label><input id="fUserPass" type="password" placeholder="••••••••"></div>
+        <div class="form-group"><label>Perfil</label><select id="fUserRole">${Object.entries(ROLES).map(([k,v])=>`<option value="${k}"${d.role===k?' selected':''}>${v.label}</option>`).join('')}</select></div>
+      </div>
+      <div class="form-group"><label>Status</label><select id="fUserStatus"><option value="1"${d.active?' selected':''}>Ativo</option><option value="0"${!d.active?' selected':''}>Inativo</option></select></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+        <button class="btn-outline" id="btnCancelModal">Cancelar</button>
+        <button class="btn-primary" id="btnSalvarUser">Salvar</button>
+      </div>`;
+  }
+  if(m.type==='novoFunc'||m.type==='editFunc'){
+    const d=m.data||{nome:'',cargo:'',salario:0,vt:0,pix:'',status:'ativo',admissao:today()};
+    content=`<h3 style="font-size:16px;font-weight:700;margin-bottom:18px">${m.type==='novoFunc'?'Novo Funcionário':'Editar Funcionário'}</h3>
+      <div class="form-row">
+        <div class="form-group"><label>Nome Completo</label><input id="fFuncNome" value="${d.nome}"></div>
+        <div class="form-group"><label>Cargo</label><input id="fFuncCargo" value="${d.cargo}"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Salário Base (R$)</label><input id="fFuncSal" type="number" value="${d.salario}"></div>
+        <div class="form-group"><label>Valor VT (R$)</label><input id="fFuncVT" type="number" value="${d.vt}"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Chave PIX</label><input id="fFuncPix" value="${d.pix}"></div>
+        <div class="form-group"><label>Status</label><select id="fFuncStatus"><option value="ativo"${d.status==='ativo'?' selected':''}>Ativo</option><option value="inativo"${d.status==='inativo'?' selected':''}>Inativo</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Data de Admissão</label><input id="fFuncAdm" type="date" value="${d.admissao}"></div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+        <button class="btn-outline" id="btnCancelModal">Cancelar</button>
+        <button class="btn-primary" id="btnSalvarFunc">Salvar</button>
+      </div>`;
+  }
+  if(m.type==='enviarVR'){
+    content=`<h3 style="font-size:16px;font-weight:700;margin-bottom:18px">Enviar Vale Refeição (iFood)</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Isso gerará uma única pendência no valor de <strong>R$ ${m.data.total.toLocaleString('pt-BR')}</strong> no módulo Financeiro.</p>
+      <div class="form-group"><label>Número / Código do Boleto</label><input id="fBoletoVR" placeholder="Cole o código do boleto do iFood" required></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+        <button class="btn-outline" id="btnCancelModal">Cancelar</button>
+        <button class="btn-success" id="btnConfirmVR">Gerar Pagamento Financeiro</button>
+      </div>`;
+  }
+  if(m.type==='resetPass'){
+    content=`<h3 style="font-size:16px;font-weight:700;margin-bottom:14px">Redefinir Senha</h3>
+      <p style="color:var(--text2);margin-bottom:18px">Nova senha para: <strong>${m.data.name}</strong></p>
+      <div class="form-group"><label>Nova Senha</label><input id="fNewPass" type="password" placeholder="••••••••"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+        <button class="btn-outline" id="btnCancelModal">Cancelar</button>
+        <button class="btn-primary" id="btnConfirmResetPass">Salvar</button>
+      </div>`;
+  }
+  if(m.type==='confirm'){
+    content=`<h3 style="font-size:16px;font-weight:700;margin-bottom:12px">${m.title}</h3>
+      <p style="color:var(--text2);margin-bottom:22px">${m.message}</p>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn-outline" id="btnCancelModal">Cancelar</button>
+        <button class="btn-success" id="btnConfirmAction">Confirmar</button>
+      </div>`;
+  }
+  if(m.type==='alert'){
+    content=`<h3 style="font-size:16px;font-weight:700;margin-bottom:12px">${m.title||'Aviso Requerido'}</h3>
+      <p style="color:var(--text2);margin-bottom:22px">${m.message}</p>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn-primary" id="btnCancelModal">OK, entendi</button>
+      </div>`;
+  }
+  return `<div class="modal-overlay" id="modalOverlay"><div class="modal ${m.large?'modal-lg':''}">${content}</div></div>`;
+}
+
+function attachEvents(){
+  document.getElementById('btnLogin')?.addEventListener('click',()=>{
+    const email=document.getElementById('loginEmail').value.trim();
+    const pass=document.getElementById('loginPass').value.trim();
+    const user=STATE.users.find(u=>u.email===email&&u.password===pass&&u.active);
+    if(user){STATE.currentUser=user;STATE.view='app';STATE.loginError='';STATE.activeMenu='dashboard';STATE.activeSubTab='';}
+    else STATE.loginError='E-mail ou senha inválidos.';
+    STATE.loginEmail=email;STATE.loginPass=pass;render();
+  });
+  document.getElementById('loginPass')?.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btnLogin')?.click();});
+  document.getElementById('btnLogout')?.addEventListener('click',()=>{STATE.currentUser=null;STATE.view='login';STATE.loginError='';STATE.loginEmail='';STATE.loginPass='';render();});
+  document.querySelectorAll('.nav-item').forEach(btn=>btn.addEventListener('click',()=>{STATE.activeMenu=btn.dataset.menu;STATE.activeSubTab='';render();}));
+  document.querySelectorAll('[data-subtab]').forEach(btn=>btn.addEventListener('click',()=>{STATE.activeSubTab=btn.dataset.subtab;render();}));
+
+  document.getElementById('chkAllFin')?.addEventListener('change',e=>{
+    document.querySelectorAll('.chk-fin').forEach(chk=>chk.checked=e.target.checked);
+    document.getElementById('btnPagarMarcados').style.display=e.target.checked?'block':'none';
+  });
+  
+  document.querySelectorAll('.chk-fin').forEach(c=>c.addEventListener('change',()=>{
+    const qtdVal = document.querySelectorAll('.chk-fin:checked').length;
+    document.getElementById('btnPagarMarcados').style.display=qtdVal>0?'block':'none';
+  }));
+
+  document.getElementById('btnPagarMarcados')?.addEventListener('click',()=>{
+    const marcados = Array.from(document.querySelectorAll('.chk-fin:checked')).map(c=>parseFloat(c.dataset.id));
+    if(!marcados.length) return;
+    STATE.modal={type:'confirm',title:'Liquidação em Massa',message:`Você está liquidando ${marcados.length} faturas.<br>Confirma que os pagamentos foram realizados no banco com as referidas chaves?`,onConfirm:()=>{
+      marcados.forEach(id=>{
+        const c = STATE.contasPagar.find(x=>x.id===id);
+        if(c){c.status='pago'; c.dataPagamento=today(); c.pagoBy=STATE.currentUser.name;}
+      });
+      addLog(`Módulo Financeiro baixou em lote ${marcados.length} pagamentos pendentes.`);
+      STATE.modal={type:'alert', title:'Concluído', message:`Feito! ${marcados.length} pagamentos liquidados nas contas locais.`}; render();
+    }}; render();
+  });
+  document.querySelectorAll('.vr-input').forEach(inp=>inp.addEventListener('change',e=>{STATE.vrMesAtual[e.target.dataset.id]=e.target.value;render();}));
+  document.querySelectorAll('.desc-input').forEach(inp=>inp.addEventListener('change',e=>{STATE.descontosMesAtual[e.target.dataset.id]=e.target.value;render();}));
+  document.getElementById('fFiltroMes')?.addEventListener('change',e=>{STATE.folhaMesFiltro=e.target.value;STATE.descontosMesAtual={};STATE.vrMesAtual={};render();});
+  document.getElementById('btnCancelModal')?.addEventListener('click',()=>{STATE.modal=null;render();});
+  document.getElementById('modalOverlay')?.addEventListener('click',e=>{if(e.target.id==='modalOverlay'){STATE.modal=null;render();}});
+  document.getElementById('btnNovoLanc')?.addEventListener('click',e=>{STATE.modal={type:'novoLanc',tipo:e.target.dataset.tipo};render();});
+  document.getElementById('btnLoteLanc')?.addEventListener('click',e=>{STATE.modal={type:'loteLanc',tipo:e.target.dataset.tipo};render();});
+  document.getElementById('btnNovoFunc')?.addEventListener('click',()=>{STATE.modal={type:'novoFunc'};render();});
+  document.getElementById('btnNovoCad')?.addEventListener('click',e=>{const t=e.target.dataset.tipo;if(t==='motoristas')STATE.modal={type:'novoMotorista'};else if(t==='cidades')STATE.modal={type:'novoCidade'};else if(t==='veiculos')STATE.modal={type:'novoVeiculo'};render();});
+  document.getElementById('btnNovoUser')?.addEventListener('click',()=>{STATE.modal={type:'novoUser'};render();});
+  
+  document.getElementById('fMotoristaTop')?.addEventListener('change',e=>{
+    const moto=STATE.motoristas.find(x=>x.nome===e.target.value);
+    if(moto){
+      const p=document.getElementById('fPixAssoc'); if(p) p.value=moto.pix||'';
+      const f=document.getElementById('fFavAssoc'); if(f) f.value=moto.nome;
+    }
+  });
+  
+  document.querySelectorAll('[data-del-lanc]').forEach(btn=>btn.addEventListener('click',()=>{
+    const id=parseFloat(btn.dataset.delLanc), tipo=btn.dataset.tipo;
+    STATE.modal={type:'confirm',title:'Exclusão de Registro',message:'Tem certeza que quer excluir esse registro? Cuidado, esse processo é irreversível e excluirá as contas da aba atual.',onConfirm:()=>{
+      const lista=tipo==='amazon'?STATE.lancamentosAmazon:STATE.lancamentosMercado;
+      const idx = lista.findIndex(x=>x.id===id);
+      if(idx>=0) {lista.splice(idx,1); STATE.modal=null; render();}
+    }}; render();
+  }));
+
+  document.getElementById('btnSalvarUnico')?.addEventListener('click',()=>{
+    const m=STATE.modal, data=document.getElementById('fDataOp').value, motorista=document.getElementById('fMotoristaTop').value, pix=document.getElementById('fPixAssoc').value, favorecido=document.getElementById('fFavAssoc').value, valor=parseFloat(document.getElementById('fValorLivre').value)||0;
+    if(!data||!motorista||valor<=0){STATE.modal={type:'alert',message:'Preencha Data, Motorista e um Valor válido em R$.'};render();return;}
+    const lista=m.tipo==='amazon'?STATE.lancamentosAmazon:STATE.lancamentosMercado;
+    lista.push({id:Date.now(),data,motorista,pix,favorecido,valor,criadoPor:STATE.currentUser.name,criadoEm:today(),enviado:false});
+    addLog(`Cadastrou lançamento direto ${m.tipo==='amazon'?'Amazon':'Mercado Livre'} de R$ ${valor} para ${motorista}`);
+    STATE.modal=null;render();
+  });
+
+  document.getElementById('btnProcessarLote')?.addEventListener('click',()=>{
+    const m=STATE.modal, txt=document.getElementById('fAreaLote').value.trim(), dataLote=document.getElementById('fDataLote').value;
+    if(!txt||!dataLote){STATE.modal={type:'alert',message:'Preencha os campos e cole os dados corretamente na caixa de texto central.'};render();return;}
+    const lista=m.tipo==='amazon'?STATE.lancamentosAmazon:STATE.lancamentosMercado;
+    let count=0;
+    txt.split('\n').forEach((linha,idx)=>{
+      const partes=linha.trim().split(/\t|\s{2,}/);
+      if(partes.length>=2){
+        const nome=partes[0].trim(), valor=parseFloat(partes[1].replace(',','.').replace(/[^0-9.]/g,''))||0;
+        if(nome&&valor>0){
+          const mot=STATE.motoristas.find(x=>x.nome.toLowerCase()===nome.toLowerCase())||{pix:'Não localizado',nome:nome};
+          lista.push({id:Date.now()+idx,data:dataLote,motorista:nome,pix:mot.pix||'S/ PIX',favorecido:mot.nome,valor,criadoPor:STATE.currentUser.name+' (Lote)',criadoEm:today(),enviado:false});
+          count++;
+        }
+      }
+    });
+    addLog(`Importou ${count} lançamentos locais em lote (${m.tipo==='amazon'?'Amazon':'Mercado Livre'})`);
+    STATE.modal={type:'alert',title:'Lote Processado',message:`Lote processado com sucesso!<br>${count} registros salvos localmente nesta sessão (Aguardam autorização de envio do Supervisor).`}; render();
+  });
+
+  document.getElementById('btnEnviarFinOp')?.addEventListener('click',e=>{
+    const tipo = e.target.dataset.tipo;
+    const lista = tipo==='amazon'?STATE.lancamentosAmazon:STATE.lancamentosMercado;
+    const pendentes = lista.filter(x=>!x.enviado);
+    if(pendentes.length===0) return;
+    STATE.modal={type:'confirm',title:'Finalização de Repasse Financeiro',message:`Tem certeza que deseja oficializar e enviar esses <b>${pendentes.length} pagamentos pendentes</b> para o time Financeiro efetuar a transação hoje?`,onConfirm:()=>{
+       pendentes.forEach((l,i)=>{
+          l.enviado=true;
+          l.contaId=Date.now() + i;
+          STATE.contasPagar.push({id:l.contaId,motorista:l.motorista,semana:l.data.slice(0,7),valor:l.valor,pix:l.pix,status:'pendente',dataPagamento:null,pagoBy:null,origem:tipo});
+       });
+       addLog(`Supervisor enviou pacote de ${pendentes.length} pendências do ${tipo} para Caixa Geral`);
+       STATE.modal={type:'alert',title:'Tudo Certo!',message:`Sucesso! Foram abertas ${pendentes.length} contas a pagar vinculadas no painel do Financeiro Central.`};render();
+    }}; render();
+  });
+  document.querySelectorAll('[data-edit-mot]').forEach(btn=>btn.addEventListener('click',()=>{const m=STATE.motoristas.find(x=>x.id===parseFloat(btn.dataset.editMot));STATE.modal={type:'editMotorista',id:m.id,data:{...m}};render();}));
+  document.querySelectorAll('[data-edit-cid]').forEach(btn=>btn.addEventListener('click',()=>{const c=STATE.cidades.find(x=>x.id===parseFloat(btn.dataset.editCid));STATE.modal={type:'editCidade',id:c.id,data:{...c}};render();}));
+  document.querySelectorAll('[data-edit-vei]').forEach(btn=>btn.addEventListener('click',()=>{const v=STATE.veiculos.find(x=>x.id===parseFloat(btn.dataset.editVei));STATE.modal={type:'editVeiculo',id:v.id,data:{...v}};render();}));
+  document.querySelectorAll('[data-edit-user]').forEach(btn=>btn.addEventListener('click',()=>{const u=STATE.users.find(x=>x.id===parseFloat(btn.dataset.editUser));STATE.modal={type:'editUser',id:u.id,data:{...u}};render();}));
+  document.querySelectorAll('[data-edit-func]').forEach(btn=>btn.addEventListener('click',()=>{const f=STATE.funcionarios.find(x=>x.id===parseFloat(btn.dataset.editFunc));STATE.modal={type:'editFunc',id:f.id,data:{...f}};render();}));
+  document.querySelectorAll('[data-reset-pass]').forEach(btn=>btn.addEventListener('click',()=>{const u=STATE.users.find(x=>x.id===parseFloat(btn.dataset.resetPass));STATE.modal={type:'resetPass',data:{...u}};render();}));
+  document.querySelectorAll('[data-pagar]').forEach(btn=>btn.addEventListener('click',()=>{
+    const id=parseFloat(btn.dataset.pagar),c=STATE.contasPagar.find(x=>x.id===id);
+    STATE.modal={type:'confirm',title:'Confirmar Pagamento',message:`Marcar pagamento de <strong>R$ ${c.valor.toLocaleString('pt-BR')}</strong> para <strong>${c.motorista}</strong> como pago?`,onConfirm:()=>{c.status='pago';c.dataPagamento=today();c.pagoBy=STATE.currentUser.name;addLog(`Marcou pagamento de ${c.motorista} (${c.semana}) como pago — R$ ${c.valor.toLocaleString('pt-BR')}`);STATE.modal=null;render();}};render();
+  }));
+  document.getElementById('btnConfirmAction')?.addEventListener('click',()=>STATE.modal?.onConfirm?.());
+  document.getElementById('btnEnviarFolha')?.addEventListener('click',()=>{
+    STATE.modal={type:'confirm',title:'Enviar Folha ao Financeiro',message:'Confirma o envio da folha do mês selecionado ('+STATE.folhaMesFiltro+') ao Financeiro?',onConfirm:()=>{
+      const m=STATE.folhaMesFiltro;
+      let count=0;
+      STATE.funcionarios.filter(f=>f.status==='ativo').forEach(f=>{
+        const desc=Number(STATE.descontosMesAtual[f.id]||0);
+        const total=f.salario+f.vt-desc;
+        const existe=STATE.contasPagar.find(c=>c.motorista===f.nome&&c.semana===m&&c.origem==='rh');
+        if(!existe){
+          STATE.contasPagar.push({id:Date.now()+f.id,motorista:f.nome,semana:m,valor:total,pix:f.pix,status:'pendente',dataPagamento:null,pagoBy:null,origem:'rh'});
+          count++;
+        }
+      });
+      addLog(`Enviou folha RH (${m}) ao Financeiro (${count} registros criados)`);
+      STATE.descontosMesAtual={};
+      STATE.modal={type:'alert',title:'Recursos Humanos',message:`Folha preenchida e enviada com segurança.<br/>(${count} pagamentos registrados pendentes)`};render();
+    }};render();
+  });
+  document.getElementById('btnEnviarVR')?.addEventListener('click',()=>{
+    const total = STATE.funcionarios.filter(f=>f.status==='ativo').reduce((s,f)=>s+Number(STATE.vrMesAtual[f.id]||0),0);
+    STATE.modal={type:'enviarVR', data: {total}}; render();
+  });
+  document.getElementById('btnConfirmVR')?.addEventListener('click',()=>{
+    const boleto = document.getElementById('fBoletoVR').value.trim();
+    if(!boleto){STATE.modal={type:'alert',message:'Informe o código ou linha digitável do boleto.'};render();return;}
+    const mesAtual=STATE.folhaMesFiltro;
+    const total = STATE.modal.data.total;
+    const existe = STATE.contasPagar.find(c=>c.motorista==='iFood (VR)'&&c.semana===mesAtual&&c.origem==='rh_vr');
+    if(!existe) STATE.contasPagar.push({id:Date.now(),motorista:'iFood (VR)',semana:mesAtual,valor:total,pix:boleto,status:'pendente',dataPagamento:null,pagoBy:null,origem:'rh_vr'});
+    addLog(`Enviou total de VR do mês ao Financeiro, via boleto`);
+    STATE.vrMesAtual={};
+    STATE.modal={type:'alert',title:'VR Computado',message:'Valores de alimentação VR repassados ao fechamento Financeiro via boleto único!'};render();
+  });
+  function quickAlert(msg){STATE.modal={type:'alert',message:msg};render();}
+  document.getElementById('btnSalvarMot')?.addEventListener('click',()=>{
+    const m=STATE.modal,nome=document.getElementById('fNome').value.trim(),telefone=document.getElementById('fTel').value.trim(),cidade=document.getElementById('fCidadeBase').value,veiculo=document.getElementById('fVeiculoPad').value,pix=document.getElementById('fPix').value.trim(),status=document.getElementById('fStatus').value;
+    if(!nome)return quickAlert('O nome do motorista precisa ser informado e válido.');
+    if(m.type==='novoMotorista'){STATE.motoristas.push({id:Date.now(),nome,telefone,cidade,veiculo,pix,status});addLog(`Cadastrou motorista: ${nome}`);}
+    else{Object.assign(STATE.motoristas.find(x=>x.id===m.id),{nome,telefone,cidade,veiculo,pix,status});addLog(`Editou motorista: ${nome}`);}
+    STATE.modal=null;render();
+  });
+  document.getElementById('btnSalvarCid')?.addEventListener('click',()=>{
+    const m=STATE.modal,nome=document.getElementById('fNomeCid').value.trim(),coleta=parseFloat(document.getElementById('fVColeta').value)||0,entrega=parseFloat(document.getElementById('fVEntrega').value)||0,lm=parseFloat(document.getElementById('fVLM').value)||0;
+    if(!nome)return quickAlert('Preencha a cidade adequadamente.');
+    if(m.type==='novoCidade'){STATE.cidades.push({id:Date.now(),nome,coleta,entrega,lastmile:lm});addLog(`Cadastrou cidade: ${nome}`);}
+    else{Object.assign(STATE.cidades.find(x=>x.id===m.id),{nome,coleta,entrega,lastmile:lm});addLog(`Editou cidade: ${nome}`);}
+    STATE.modal=null;render();
+  });
+  document.getElementById('btnSalvarVei')?.addEventListener('click',()=>{
+    const m=STATE.modal,tipo=document.getElementById('fTipoVei').value.trim(),adicional=parseFloat(document.getElementById('fAdicional').value)||0;
+    if(!tipo)return quickAlert('Informe uma descrição pro veículo.');
+    if(m.type==='novoVeiculo'){STATE.veiculos.push({id:Date.now(),tipo,adicional});addLog(`Cadastrou veículo: ${tipo}`);}
+    else{Object.assign(STATE.veiculos.find(x=>x.id===m.id),{tipo,adicional});addLog(`Editou veículo: ${tipo}`);}
+    STATE.modal=null;render();
+  });
+  document.getElementById('btnSalvarUser')?.addEventListener('click',()=>{
+    const m=STATE.modal,name=document.getElementById('fUserName').value.trim(),email=document.getElementById('fUserEmail').value.trim(),pass=document.getElementById('fUserPass').value,role=document.getElementById('fUserRole').value,active=document.getElementById('fUserStatus').value==='1';
+    if(!name||!email)return quickAlert('Preencha as informações obrigatórias.');
+    if(m.type==='novoUser'){if(!pass)return quickAlert('Dê uma senha ao novo usuário.');STATE.users.push({id:Date.now(),name,email,password:pass,role,active,createdAt:today()});addLog(`Criou usuário: ${name}`);}
+    else{const u=STATE.users.find(x=>x.id===m.id);Object.assign(u,{name,email,role,active});if(pass)u.password=pass;addLog(`Editou usuário: ${name}`);}
+    STATE.modal=null;render();
+  });
+  document.getElementById('btnSalvarFunc')?.addEventListener('click',()=>{
+    const m=STATE.modal,nome=document.getElementById('fFuncNome').value.trim(),cargo=document.getElementById('fFuncCargo').value.trim(),salario=parseFloat(document.getElementById('fFuncSal').value)||0,vt=parseFloat(document.getElementById('fFuncVT').value)||0,pix=document.getElementById('fFuncPix').value.trim(),status=document.getElementById('fFuncStatus').value,admissao=document.getElementById('fFuncAdm').value;
+    if(!nome||!cargo)return quickAlert('Dados parciais, preencha corretamente para adicionar ao contrato base.');
+    if(m.type==='novoFunc'){STATE.funcionarios.push({id:Date.now(),nome,cargo,salario,vt,pix,status,admissao});addLog(`Cadastrou funcionário: ${nome}`);}
+    else{Object.assign(STATE.funcionarios.find(x=>x.id===m.id),{nome,cargo,salario,vt,pix,status,admissao});addLog(`Editou funcionário: ${nome}`);}
+    STATE.modal=null;render();
+  });
+  document.getElementById('btnConfirmResetPass')?.addEventListener('click',()=>{
+    const m=STATE.modal,nova=document.getElementById('fNewPass').value;
+    if(!nova){alert('Informe a nova senha.');return;}
+    STATE.users.find(x=>x.id===m.data.id).password=nova;addLog(`Redefiniu senha do usuário: ${m.data.name}`);STATE.modal=null;alert('Senha redefinida!');render();
+  });
+  document.getElementById('btnExportProd')?.addEventListener('click',()=>{const rows=[['Data','Motorista','PIX','Favorecido','Valor','Origem']];[...STATE.lancamentosAmazon,...STATE.lancamentosMercado].forEach(l=>rows.push([l.data,l.motorista,l.pix,l.favorecido,l.valor,l.criadoPor.includes('Amazon')?'Amazon':'Mercado Livre']));exportCSV(rows,'lancamentos_hist.csv');});
+  document.getElementById('btnExportFin')?.addEventListener('click',()=>{const rows=[['Motorista','Semana','Valor','Chave PIX','Status','Data Pagamento','Pago por']];STATE.contasPagar.forEach(c=>rows.push([c.motorista,c.semana,c.valor,c.pix,c.status,c.dataPagamento||'',c.pagoBy||'']));exportCSV(rows,'financeiro.csv');});
+  document.getElementById('btnExportRH')?.addEventListener('click',()=>{const rows=[['Funcionário','Cargo','Salário','VT','Desconto','Total Mensal']];STATE.funcionarios.filter(f=>f.status==='ativo').forEach(f=>rows.push([f.nome,f.cargo,f.salario,f.vt,Number(STATE.descontosMesAtual[f.id]||0),f.salario+f.vt-Number(STATE.descontosMesAtual[f.id]||0)]));exportCSV(rows,'folha_rh_deducoes.csv');});
+}
+
+function exportCSV(rows,filename){
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
+}
+
+render();
+</script>
+</body>
+</html>
