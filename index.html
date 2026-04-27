@@ -4,330 +4,336 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Morais Transportes</title>
+  <title>Morais Transportes | Gestão Logística</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Bibliotecas para Geração de PDF e ZIP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
   <style>
+    :root {
+      --primary: #1e40af; /* Deeper Corporate Blue */
+      --primary-hover: #1e3a8a;
+      --primary-light: #eff6ff;
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --sidebar-bg: #111827; /* Dark Slate for Sidebar */
+      --text-main: #111827;
+      --text-secondary: #374151;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --success: #059669;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --radius: 8px; /* Sharper Corporate Radius */
+    }
+
+    body.dark {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --sidebar-bg: #020617;
+      --text-main: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', Arial, sans-serif
-    }
-
-    :root {
-      --blue: #2563EB;
-      --blue-dark: #1E3A8A;
-      --bg: #F3F4F6;
-      --white: #FFFFFF;
-      --green: #22C55E;
-      --red: #EF4444;
-      --yellow: #F59E0B;
-      --gray: #6B7280;
-      --gray-light: #E5E7EB;
-      --text: #111827;
-      --text2: #374151;
-      --text3: #6B7280
+      font-family: 'Inter', sans-serif;
     }
 
     body {
       background: var(--bg);
-      color: var(--text);
+      color: var(--text-main);
       font-size: 14px;
-      min-height: 100vh
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+      overflow-x: hidden;
     }
 
-    input,
-    select,
-    textarea {
-      font-family: inherit;
-      font-size: 13px;
-      border: 1px solid #D1D5DB;
-      border-radius: 6px;
-      padding: 8px 10px;
-      width: 100%;
-      outline: none;
-      background: #fff;
-      color: var(--text)
+    h1, h2, h3, .stat-value {
+      font-family: 'Outfit', sans-serif;
     }
 
-    input:focus,
-    select:focus,
-    textarea:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15)
+    /* Glassmorphism Effect */
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
     }
 
-    button {
-      font-family: inherit;
-      font-size: 13px;
-      cursor: pointer;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 16px;
-      transition: all .15s
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
-    .btn-primary {
-      background: var(--blue);
-      color: #fff
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .btn-primary:hover {
-      background: #1d4ed8
+    @keyframes modalScale {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
     }
 
-    .btn-success {
-      background: var(--green);
-      color: #fff
-    }
+    .animate-fade { animation: fadeIn 0.4s ease-out; }
+    .animate-slide { animation: slideUp 0.5s ease-out; }
 
-    .btn-success:hover {
-      background: #16a34a
-    }
-
-    .btn-danger {
-      background: var(--red);
-      color: #fff
-    }
-
-    .btn-danger:hover {
-      background: #dc2626
-    }
-
-    .btn-warning {
-      background: var(--yellow);
-      color: #fff
-    }
-
-    .btn-warning:hover {
-      background: #d97706
-    }
-
-    .btn-outline {
-      background: #fff;
-      color: var(--blue);
-      border: 1px solid var(--blue)
-    }
-
-    .btn-outline:hover {
-      background: #eff6ff
-    }
-
-    .btn-sm {
-      padding: 5px 10px;
-      font-size: 12px
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 600
-    }
-
-    .badge-green {
-      background: #dcfce7;
-      color: #15803d
-    }
-
-    .badge-red {
-      background: #fee2e2;
-      color: #b91c1c
-    }
-
-    .badge-yellow {
-      background: #fef3c7;
-      color: #92400e
-    }
-
-    .badge-blue {
-      background: #dbeafe;
-      color: #1d4ed8
-    }
-
-    .badge-gray {
-      background: #f3f4f6;
-      color: #374151
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse
-    }
-
-    th {
-      background: #f9fafb;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: .5px;
-      color: var(--text3);
-      padding: 10px 12px;
-      text-align: left;
-      border-bottom: 1px solid var(--gray-light)
-    }
-
-    td {
-      padding: 10px 12px;
-      border-bottom: 1px solid #f3f4f6;
-      color: var(--text2);
-      font-size: 13px
-    }
-
-    tr:last-child td {
-      border-bottom: none
-    }
-
-    tr:hover td {
-      background: #f9fafb
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 10px;
-      border: 1px solid var(--gray-light);
-      padding: 20px
-    }
-
-    .modal-overlay {
-      position: fixed;
+    /* Layout Components */
+    .sidebar {
+      width: 240px;
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      height: 100vh;
+      position: sticky;
       top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, .45);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000
+      z-index: 100;
     }
 
-    .modal {
-      background: #fff;
-      border-radius: 12px;
-      padding: 24px;
-      width: 90%;
-      max-width: 480px;
-      max-height: 90vh;
-      overflow-y: auto
-    }
-
-    .modal-lg {
-      max-width: 700px
-    }
-
-    .form-group {
-      margin-bottom: 14px
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text2);
-      margin-bottom: 5px
-    }
-
-    .form-row {
+    .nav-item {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px
-    }
-
-    .alert {
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 13px;
-      display: flex;
+      grid-template-columns: 24px 1fr;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 12px
+      gap: 16px;
+      width: 100%;
+      padding: 12px 24px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+      transition: all 0.2s;
     }
 
-    .alert-warning {
-      background: #fef3c7;
-      color: #92400e;
-      border: 1px solid #fde68a
+    .nav-item span:first-child {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 16px;
     }
 
-    .alert-danger {
-      background: #fee2e2;
-      color: #b91c1c;
-      border: 1px solid #fecaca
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
     }
 
-    .alert-success {
-      background: #dcfce7;
-      color: #15803d;
-      border: 1px solid #bbf7d0
+    .nav-item.active {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      border-left: 4px solid var(--primary);
+      padding-left: 20px; /* Offset for border */
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 24px 32px;
+      overflow-y: auto;
+    }
+
+    /* UI Components */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 20px;
+      box-shadow: var(--shadow);
     }
 
     .stat-card {
-      background: #fff;
-      border-radius: 10px;
-      border: 1px solid var(--gray-light);
-      padding: 16px
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 16px;
+      box-shadow: var(--shadow);
     }
 
+
     .stat-label {
-      font-size: 11px;
-      color: var(--text3);
-      font-weight: 600;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: .5px;
-      margin-bottom: 6px
+      letter-spacing: 1px;
+      margin-bottom: 8px;
     }
 
     .stat-value {
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--text)
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-main);
     }
 
-    .stat-sub {
-      font-size: 11px;
-      color: var(--text3);
-      margin-top: 3px
-    }
-
-    .tab-bar {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 16px;
-      background: #f3f4f6;
-      padding: 4px;
-      border-radius: 8px
-    }
-
-    .tab {
-      padding: 7px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 500;
+    /* Buttons */
+    button {
       cursor: pointer;
-      color: var(--text3);
       border: none;
-      background: transparent
-    }
-
-    .tab.active {
-      background: #fff;
-      color: var(--blue);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, .1)
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
       align-items: center;
-      margin-bottom: 16px
+      justify-content: center;
+      gap: 8px;
     }
 
-    .section-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text)
+    button:active {
+      transform: scale(0.97);
     }
+
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .btn-outline:hover {
+      background: var(--primary-light);
+    }
+
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-success:hover { background: #10b981; filter: brightness(1.1); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+    
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #ef4444; filter: brightness(1.1); }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: #f8fafc;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      padding: 10px 16px;
+      text-align: left;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+    }
+
+    body.dark th { background: #1e293b; }
+
+    td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    tr:hover td {
+      background: #f9fafb;
+    }
+
+
+    body.dark tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Badges */
+    .badge {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-block;
+    }
+
+    .badge-blue { background: #eff6ff; color: #2563eb; border: 1px solid #dbeafe; }
+    .badge-green { background: #ecfdf5; color: #059669; border: 1px solid #d1fae5; }
+    .badge-red { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+    .badge-gray { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .badge-yellow { background: #fffbeb; color: #92400e; border: 1px solid #fef3c7; }
+    .badge-purple { background: #faf5ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+    .badge-orange { background: #fff7ed; color: #ea580c; border: 1px solid #ffedd5; }
+
+    /* Forms */
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    
+    input, select, textarea {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+
+    /* Modals */
+    .modal-overlay {
+      background: rgba(15, 23, 42, 0.75);
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 32px;
+      width: 100%;
+      max-width: 550px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    /* Custom Chart Styles */
+    .chart-bar {
+      transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .chart-path {
+      stroke-dasharray: 2000;
+      stroke-dashoffset: 2000;
+      animation: drawLine 2s forwards ease-in-out;
+    }
+
+    @keyframes drawLine {
+      to { stroke-dashoffset: 0; }
+    }
+
   </style>
 </head>
 
@@ -337,23 +343,23 @@
     const STATE = {
       view: 'login', currentUser: null, activeMenu: 'dashboard', activeSubTab: '', modal: null,
       users: [
-        { id: 7, name: 'Login Rápido', email: '1', password: '1', role: 'admin', active: true, createdAt: '2025-01-01' },
-        { id: 1, name: 'Admin Sistema', email: 'admin@morais.com', password: 'admin123', role: 'admin', active: true, createdAt: '2024-01-01' },
-        { id: 2, name: 'Carlos Amazon', email: 'amazon@morais.com', password: 'op123', role: 'op_amazon', active: true, createdAt: '2024-01-01' },
-        { id: 3, name: 'Ana Mercado', email: 'mercado@morais.com', password: 'op123', role: 'op_mercado', active: true, createdAt: '2024-01-01' },
-        { id: 4, name: 'Pedro Financeiro', email: 'financeiro@morais.com', password: 'op123', role: 'op_financeiro', active: true, createdAt: '2024-01-01' },
-        { id: 5, name: 'Julia RH', email: 'rh@morais.com', password: 'op123', role: 'op_rh', active: true, createdAt: '2024-01-01' },
-        { id: 6, name: 'Marcos Supervisor', email: 'supervisor@morais.com', password: 'op123', role: 'supervisor', active: true, createdAt: '2024-01-01' },
+        { id: 7, name: 'Login Rápido', email: '1', password: '1', role: 'admin', active: true, createdAt: '2025-01-01', permissions: ['dashboard', 'amazon', 'mercado', 'petlove', 'shopee', 'outros', 'rh', 'financeiro', 'cadastros', 'relatorios', 'contratos', 'administracao'] },
+        { id: 1, name: 'Admin Sistema', email: 'admin@morais.com', password: 'admin123', role: 'admin', active: true, createdAt: '2024-01-01', permissions: ['dashboard', 'amazon', 'mercado', 'petlove', 'shopee', 'outros', 'rh', 'financeiro', 'cadastros', 'relatorios', 'contratos', 'administracao'] },
+        { id: 2, name: 'Carlos Amazon', email: 'amazon@morais.com', password: 'op123', role: 'op_amazon', active: true, createdAt: '2024-01-01', permissions: ['dashboard', 'amazon', 'cadastros'] },
+        { id: 3, name: 'Ana Mercado', email: 'mercado@morais.com', password: 'op123', role: 'op_mercado', active: true, createdAt: '2024-01-01', permissions: ['dashboard', 'mercado', 'cadastros'] },
+        { id: 4, name: 'Pedro Financeiro', email: 'financeiro@morais.com', password: 'op123', role: 'op_financeiro', active: true, createdAt: '2024-01-01', permissions: ['dashboard', 'financeiro', 'relatorios'] },
+        { id: 5, name: 'Julia RH', email: 'rh@morais.com', password: 'op123', role: 'op_rh', active: true, createdAt: '2024-01-01', permissions: ['dashboard', 'rh', 'cadastros', 'relatorios', 'contratos'] },
+        { id: 6, name: 'Marcos Supervisor', email: 'supervisor@morais.com', password: 'op123', role: 'supervisor', active: true, createdAt: '2024-01-01', permissions: ['dashboard', 'amazon', 'mercado', 'cadastros', 'relatorios'] },
       ],
       contratosEmpresa: [
         { id: 1, parceiro: 'Amazon Logistics', tipo: 'Cliente', vigencia: '01/01/2023 a 31/12/2025', valorGarantido: 50000, status: 'ativo', contratoUrl: '' },
         { id: 2, parceiro: 'Mercado Livre Envios', tipo: 'Cliente', vigencia: '15/05/2022 a Indeterminado', valorGarantido: 85000, status: 'ativo', contratoUrl: '' },
       ],
       motoristas: [
-        { id: 1, nome: 'João Silva', telefone: '(19) 99001-2345', cidade: 'Campinas', veiculo: 'Utilitário', pix: 'joao.silva@pix', status: 'ativo' },
-        { id: 2, nome: 'Pedro Souza', telefone: '(19) 98765-4321', cidade: 'Sumaré', veiculo: 'Moto', pix: 'pedro.souza@pix', status: 'ativo' },
-        { id: 3, nome: 'Maria Costa', telefone: '(11) 97654-3210', cidade: 'São Paulo', veiculo: 'Carro', pix: '', status: 'ativo' },
-        { id: 4, nome: 'Lucas Lima', telefone: '(19) 96543-2109', cidade: 'Indaiatuba', veiculo: 'Utilitário', pix: 'lucas.lima@pix', status: 'inativo' },
+        { id: 1, nome: 'João Silva', telefone: '(19) 99001-2345', cidade: 'Campinas', veiculo: 'Utilitário', pix: 'joao.silva@pix', status: 'ativo', operacao: 'amazon' },
+        { id: 2, nome: 'Pedro Souza', telefone: '(19) 98765-4321', cidade: 'Sumaré', veiculo: 'Moto', pix: 'pedro.souza@pix', status: 'ativo', operacao: 'amazon' },
+        { id: 3, nome: 'Maria Costa', telefone: '(11) 97654-3210', cidade: 'São Paulo', veiculo: 'Carro', pix: '', status: 'ativo', operacao: 'mercado' },
+        { id: 4, nome: 'Lucas Lima', telefone: '(19) 96543-2109', cidade: 'Indaiatuba', veiculo: 'Utilitário', pix: 'lucas.lima@pix', status: 'inativo', operacao: 'shopee' },
       ],
       cidades: [
         { id: 1, nome: 'Campinas' },
@@ -377,6 +383,9 @@
         { id: 1, data: '2025-04-10', motorista: 'Maria Costa', pix: 'maria.costa@pix', favorecido: 'Maria Costa', valor: 5125, base: 'ELP7', criadoPor: 'Ana Mercado', criadoEm: '2025-04-10', enviado: true },
         { id: 2, data: '2025-04-03', motorista: 'João Silva', pix: 'joao.silva@pix', favorecido: 'João Silva', valor: 3415, base: 'ESV8', criadoPor: 'Ana Mercado', criadoEm: '2025-04-03', enviado: true },
       ],
+      lancamentosPetlove: [],
+      lancamentosShopee: [],
+      lancamentosOutros: [],
       contasPagar: [
         { id: 1, motorista: 'João Silva', semana: '2025-W15', valor: 5025, pix: 'joao.silva@pix', status: 'pendente', dataPagamento: null, pagoBy: null, origem: 'amazon' },
         { id: 2, motorista: 'Pedro Souza', semana: '2025-W15', valor: 2980, pix: 'pedro.souza@pix', status: 'pendente', dataPagamento: null, pagoBy: null, origem: 'amazon' },
@@ -396,8 +405,22 @@
         { id: 3, usuario: 'Pedro Financeiro', acao: 'Marcou pagamento de João Silva (W14) como pago', data: '2025-04-05 14:02' },
         { id: 4, usuario: 'Julia RH', acao: 'Enviou folha RH março/2025 ao Financeiro', data: '2025-03-30 16:45' },
       ],
+      tabelaPrecos: [
+        { id: 1, base: 'ELP7', veiculo: 'UTILITARIOS', cidade: 'CAMPINAS', valor: 240 },
+        { id: 2, base: 'ELP7', veiculo: 'VUC', cidade: 'CAMPINAS', valor: 500 },
+        { id: 3, base: 'ELP7', veiculo: 'FROTA', cidade: 'CAMPINAS', valor: 350 },
+        { id: 4, base: 'ESV8', veiculo: 'UTILITARIOS', cidade: 'CAMPINAS', valor: 250 },
+        { id: 5, base: 'VRR9', veiculo: 'UTILITARIOS', cidade: 'CAMPINAS', valor: 260 }
+      ],
+      lancamentosFechamento: [
+        { id: 101, data: '2025-04-10', motorista: 'João Silva', login: 'joao.silva', veiculo: 'Utilitário', cidade: 'Campinas', cluster: 'C1', rota: 240, pedagio: 15.50, adicional: 0, combustivel: 0, total: 255.50, base: 'ELP7' },
+        { id: 102, data: '2025-04-11', motorista: 'João Silva', login: 'joao.silva', veiculo: 'Utilitário', cidade: 'Campinas', cluster: 'C1', rota: 240, pedagio: 0, adicional: 20, combustivel: 0, total: 260, base: 'ELP7' },
+        { id: 103, data: '2025-04-10', motorista: 'Pedro Souza', login: 'pedro.souza', veiculo: 'Moto', cidade: 'Sumaré', cluster: 'S2', rota: 180, pedagio: 0, adicional: 0, combustivel: 15, total: 195, base: 'ELP7' },
+        { id: 104, data: '2025-04-12', motorista: 'Maria Costa', login: 'maria.costa', veiculo: 'Carro', cidade: 'São Paulo', cluster: 'SP1', rota: 320, pedagio: 45.20, adicional: 50, combustivel: 0, total: 415.20, base: 'ELP7' }
+      ],
       loginError: '', loginEmail: '', loginPass: '', vrMesAtual: {}, descontosMesAtual: {}, folhaMesFiltro: new Date().toISOString().slice(0, 7),
-      filters: { search: '', dataInicio: '', dataFim: '' },
+      filters: { search: '', dataInicio: '', dataFim: '', base: '', origem: '', fechMotorista: '', fechLogin: '', opFilter: 'amazon' },
+      dashboardFilter: 'all'
     };
 
     const ROLES = {
@@ -410,20 +433,23 @@
     };
 
     function canAccess(menu) {
-      const r = STATE.currentUser?.role;
-      if (r === 'admin') return true;
-      const map = {
-        dashboard: true,
-        amazon: ['op_amazon', 'supervisor'].includes(r),
-        mercado: ['op_mercado', 'supervisor'].includes(r),
-        financeiro: r === 'op_financeiro',
-        rh: r === 'op_rh',
-        cadastros: ['op_amazon', 'op_mercado', 'op_rh', 'supervisor'].includes(r),
-        relatorios: ['supervisor', 'op_rh', 'op_financeiro'].includes(r),
-        contratos: r === 'op_rh',
-        administracao: false
-      };
-      return map[menu] || false;
+      if (!STATE.currentUser) return false;
+      if (STATE.currentUser.role === 'admin') return true;
+      
+      // Mapeamento de permissões simplificado
+      const userPerms = STATE.currentUser.permissions || [];
+      
+      // Permissões de sub-módulos para Operadores
+      if (menu === 'amazon' && userPerms.includes('amazon')) return true;
+      if (menu === 'mercado' && userPerms.includes('mercado')) return true;
+      if (menu === 'petlove' && userPerms.includes('petlove')) return true;
+      if (menu === 'shopee' && userPerms.includes('shopee')) return true;
+      if (menu === 'outros' && userPerms.includes('outros')) return true;
+      
+      // Permissões gerais
+      if (userPerms.includes(menu)) return true;
+      
+      return false;
     }
     function addLog(acao) { STATE.logs.unshift({ id: Date.now(), usuario: STATE.currentUser.name, acao, data: new Date().toLocaleString('pt-BR') }); }
     function today() { return new Date().toISOString().split('T')[0]; }
@@ -437,276 +463,305 @@
       return c ? c.dataPagamento : null;
     }
     function calcValor(cidade, veiculo, coletas, entregas, lastmile) { const c = STATE.cidades.find(x => x.nome === cidade) || { coleta: 20, entrega: 25, lastmile: 12 }; const v = STATE.veiculos.find(x => x.tipo === veiculo) || { adicional: 0 }; return coletas * c.coleta + entregas * c.entrega + lastmile * c.lastmile + v.adicional; }
-    function render() { document.getElementById('app').innerHTML = buildHTML(); attachEvents(); }
+    function getPrecoRota(base, veiculo, cidade) {
+      const item = STATE.tabelaPrecos.find(p => p.base === base && p.veiculo === veiculo && p.cidade === cidade);
+      return item ? item.valor : 0;
+    }
+    function render() { 
+      const app = document.getElementById('app');
+      app.style.opacity = '0';
+      app.innerHTML = buildHTML(); 
+      attachEvents(); 
+      setTimeout(() => { app.style.transition = 'opacity 0.4s ease'; app.style.opacity = '1'; }, 50);
+    }
+
     function buildHTML() { return STATE.view === 'login' ? buildLogin() : buildApp(); }
 
     function buildLogin() {
-      return `<div style="display:flex;height:100vh;background:linear-gradient(135deg,#1E3A8A,#2563EB);align-items:center;justify-content:center;padding:20px">
-    <div style="width:100%;max-width:400px;background:#fff;border-radius:12px;padding:40px;box-shadow:0 10px 25px rgba(0,0,0,0.2);text-align:center">
-      <div style="font-size:32px;font-weight:800;color:var(--blue-dark);letter-spacing:-1px;margin-bottom:8px">Morais Transportes</div>
-      <p style="color:var(--text3);font-size:13px;margin-bottom:28px">Acesso restrito a usuários autorizados</p>
-      ${STATE.loginError ? `<div class="alert alert-danger" style="text-align:left;margin-bottom:16px"><span>&#9888;</span>${STATE.loginError}</div>` : ''}
-      <div class="form-group" style="text-align:left"><label>E-mail</label><input id="loginEmail" type="text" placeholder="seu@email.com" value="${STATE.loginEmail}"></div>
-      <div class="form-group" style="text-align:left"><label>Senha</label><input id="loginPass" type="password" placeholder="••••••••" value="${STATE.loginPass}"></div>
-      <button class="btn-primary" id="btnLogin" style="width:100%;padding:12px;font-size:15px;font-weight:600;margin-top:16px">Entrar no Sistema</button>
-      <p style="margin-top:20px;font-size:11px;color:var(--text3)">Dúvidas? Contate o suporte técnico.</p>
+      return `<div style="display:flex;height:100vh;background:#0f172a;align-items:center;justify-content:center;padding:20px">
+    <div style="width:100%;max-width:400px;background:#fff;border-radius:12px;padding:48px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);text-align:center">
+      <div style="width:48px;height:48px;background:var(--primary);border-radius:8px;margin:0 auto 24px;display:flex;align-items:center;justify-content:center;font-size:24px;color:white;font-weight:800">M</div>
+      <h1 style="font-size:24px;font-weight:700;color:#111827;margin-bottom:8px">Morais Transportes</h1>
+      <p style="color:#64748b;font-size:14px;margin-bottom:32px">Portal de Gestão Operacional</p>
+      ${STATE.loginError ? `<div style="text-align:left;margin-bottom:20px;background:#fef2f2;border:1px solid #fee2e2;color:#991b1b;padding:12px;border-radius:6px;font-size:13px">${STATE.loginError}</div>` : ''}
+      <div class="form-group" style="text-align:left;margin-bottom:20px">
+        <label style="color:#374151;font-size:12px;font-weight:600;margin-bottom:6px;display:block">E-mail</label>
+        <input id="loginEmail" type="text" placeholder="usuario@morais.com" value="${STATE.loginEmail}" style="width:100%;height:44px;border-radius:6px;border:1px solid #d1d5db">
+      </div>
+      <div class="form-group" style="text-align:left;margin-bottom:28px">
+        <label style="color:#374151;font-size:12px;font-weight:600;margin-bottom:6px;display:block">Senha</label>
+        <input id="loginPass" type="password" placeholder="••••••••" value="${STATE.loginPass}" style="width:100%;height:44px;border-radius:6px;border:1px solid #d1d5db">
+      </div>
+      <button class="btn-primary" id="btnLogin" style="width:100%;height:44px;font-size:14px;border-radius:6px">Acessar Sistema</button>
+      <p style="margin-top:32px;font-size:11px;color:#94a3b8">v2.4.0 — Acesso Restrito</p>
     </div>
   </div>`;
     }
+
+
 
     function buildApp() {
       const day = new Date().getDate();
       const pendentes = STATE.contasPagar.filter(c => c.status === 'pendente');
       const semPix = STATE.motoristas.filter(m => m.status === 'ativo' && !m.pix);
       const alerts = [];
-      if (day === 30 && ['op_rh', 'admin'].includes(STATE.currentUser.role)) alerts.push({ type: 'warning', msg: 'Hoje é dia 30 — feche e envie a folha de pagamento!' });
-      if (pendentes.length > 0 && ['op_financeiro', 'admin'].includes(STATE.currentUser.role)) alerts.push({ type: 'warning', msg: `${pendentes.length} pagamento(s) pendentes aguardando.` });
-      if (semPix.length > 0 && ['admin', 'op_financeiro'].includes(STATE.currentUser.role)) alerts.push({ type: 'danger', msg: `${semPix.length} motorista(s) sem chave PIX cadastrada.` });
+      if (day === 30 && ['op_rh', 'admin'].includes(STATE.currentUser.role)) alerts.push({ type: 'warning', msg: 'Fechamento de folha — Dia 30.' });
+      if (pendentes.length > 0 && ['op_financeiro', 'admin'].includes(STATE.currentUser.role)) alerts.push({ type: 'warning', msg: `${pendentes.length} pendências financeiras.` });
+      
       const menus = [
-        { id: 'dashboard', icon: '&#9638;', label: 'Dashboard' },
-        { id: 'amazon', icon: '&#9672;', label: 'Amazon' },
-        { id: 'mercado', icon: '&#9673;', label: 'Mercado Livre' },
-        { id: 'rh', icon: '&#9678;', label: 'RH' },
-        { id: 'financeiro', icon: '&#9670;', label: 'Financeiro' },
-        { id: 'cadastros', icon: '&#9643;', label: 'Cadastros' },
-        { id: 'relatorios', icon: '&#9636;', label: 'Relatórios' },
-        { id: 'contratos', icon: '&#9635;', label: 'Contratos da Empresa' },
-        { id: 'administracao', icon: '&#9677;', label: 'Administração' },
+        { id: 'dashboard', icon: '📊', label: 'Dashboard' },
+        { id: 'amazon', icon: '📦', label: 'Amazon' },
+        { id: 'mercado', icon: '🛒', label: 'Mercado Livre' },
+        { id: 'petlove', icon: '🐕', label: 'Petlove' },
+        { id: 'shopee', icon: '🛍️', label: 'Shopee' },
+        { id: 'outros', icon: '📁', label: 'Outros' },
+        { id: 'rh', icon: '👥', label: 'RH' },
+        { id: 'financeiro', icon: '💰', label: 'Financeiro' },
+        { id: 'cadastros', icon: '📝', label: 'Cadastros' },
+        { id: 'relatorios', icon: '📈', label: 'Relatórios' },
+        { id: 'contratos', icon: '📄', label: 'Contratos' },
+        { id: 'fechamento', icon: '📋', label: 'Fechamento Amazon' },
+        { id: 'administracao', icon: '⚙️', label: 'Administração' },
       ].filter(m => canAccess(m.id));
+
       return `<div style="display:flex;height:100vh;overflow:hidden">
-    <div style="width:230px;background:#1E3A8A;display:flex;flex-direction:column;flex-shrink:0">
-      <div style="padding:22px 18px;border-bottom:1px solid rgba(255,255,255,.1)">
-        <div style="color:#fff;font-size:22px;font-weight:800">Morais Transportes</div>
-        <div style="color:rgba(255,255,255,.55);font-size:11px;margin-top:2px">Morais Transportes</div>
+    <aside class="sidebar">
+      <div style="padding:24px;border-bottom:1px solid rgba(255,255,255,0.05);margin-bottom:12px">
+        <div style="font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;gap:10px">
+          <span style="background:var(--primary);width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;font-size:14px">${STATE.currentUser.name[0].toUpperCase()}</span>
+          <span style="font-size:14px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap">${STATE.currentUser.name.toUpperCase()}</span>
+        </div>
       </div>
-      <div style="flex:1;padding:12px 8px;overflow-y:auto">
-        ${menus.map(m => `<button class="nav-item${STATE.activeMenu === m.id ? ' active' : ''}" data-menu="${m.id}" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:8px;border:none;background:${STATE.activeMenu === m.id ? 'rgba(255,255,255,.15)' : 'transparent'};color:${STATE.activeMenu === m.id ? '#fff' : 'rgba(255,255,255,.65)'};cursor:pointer;font-size:13px;font-weight:500;text-align:left;margin-bottom:2px">${m.icon} ${m.label}</button>`).join('')}
+      
+      <nav style="flex:1; display:flex; flex-direction:column; gap:2px">
+        ${menus.map(m => `
+          <button class="nav-item${STATE.activeMenu === m.id ? ' active' : ''}" data-menu="${m.id}">
+            <span>${m.icon}</span>
+            <span>${m.label}</span>
+          </button>`).join('')}
+      </nav>
+
+      <div style="padding:16px;background:rgba(0,0,0,0.2);border-top:1px solid rgba(255,255,255,0.05)">
+        <div style="color:#fff;font-size:12px;font-weight:600;margin-bottom:2px">${STATE.currentUser.name}</div>
+        <div style="color:#94a3b8;font-size:10px;margin-bottom:12px">${ROLES[STATE.currentUser.role]?.label}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <button id="btnLimparFiltros" style="grid-column: span 2; background:rgba(255,255,255,0.05);color:#fff;padding:6px;font-size:11px;border-radius:4px;border:1px solid rgba(255,255,255,0.1)">
+            🧹 Limpar Filtros
+          </button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button id="btnDarkMode" style="background:rgba(255,255,255,0.05);color:#fff;padding:6px;font-size:11px;border-radius:4px">
+            ${document.body.classList.contains('dark') ? '☀️' : '🌙'}
+          </button>
+          <button id="btnLogout" style="background:rgba(239,68,68,0.1);color:#fca5a5;padding:6px;font-size:11px;border-radius:4px">
+            Sair
+          </button>
+        </div>
       </div>
-      <div style="padding:14px;border-top:1px solid rgba(255,255,255,.1)">
-        <div style="color:rgba(255,255,255,.9);font-size:13px;font-weight:600;padding:4px 12px">${STATE.currentUser.name}</div>
-        <div style="color:rgba(255,255,255,.5);font-size:11px;padding:0 12px 8px">${ROLES[STATE.currentUser.role]?.label}</div>
-        <button id="btnLogout" style="width:100%;padding:8px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:none;border-radius:6px;cursor:pointer;font-size:12px">Sair do sistema</button>
-      </div>
-    </div>
-    <div style="flex:1;overflow-y:auto;background:var(--bg)">
-      <div style="padding:24px 28px">
-        ${alerts.map(a => `<div class="alert alert-${a.type}">${a.type === 'warning' ? '&#9888;' : '&#10005;'} ${a.msg}</div>`).join('')}
+    </aside>
+
+    <main class="main-content">
+      <div class="animate-fade">
+        ${alerts.length > 0 ? `<div style="display:flex;gap:12px;margin-bottom:24px">
+          ${alerts.map(a => `<div style="background:${a.type === 'warning' ? '#fffbeb' : '#fef2f2'}; border:1px solid ${a.type === 'warning' ? '#fef3c7' : '#fee2e2'}; color:${a.type === 'warning' ? '#92400e' : '#991b1b'}; padding:10px 16px; border-radius:6px; font-size:12px; font-weight:600; display:flex; align-items:center; gap:8px">
+            <span>${a.type === 'warning' ? '⚠️' : '❌'}</span> ${a.msg}
+          </div>`).join('')}
+        </div>` : ''}
         ${buildSection()}
       </div>
-    </div>
+    </main>
     ${STATE.modal ? buildModal() : ''}
   </div>`;
     }
+
+
 
     function buildSection() {
       switch (STATE.activeMenu) {
         case 'dashboard': return buildDashboard();
         case 'amazon': return buildLancamentos('amazon');
         case 'mercado': return buildLancamentos('mercado');
+        case 'petlove': return buildLancamentos('petlove');
+        case 'shopee': return buildLancamentos('shopee');
+        case 'outros': return buildLancamentos('outros');
         case 'financeiro': return buildFinanceiro();
         case 'rh': return buildRH();
         case 'cadastros': return buildCadastros();
         case 'relatorios': return buildRelatorios();
         case 'contratos': return buildContratos();
+        case 'fechamento': return buildFechamento();
         case 'administracao': return buildAdministracao();
         default: return '<p>Módulo em desenvolvimento</p>';
       }
     }
 
     function buildDashboard() {
-      const all = [...STATE.lancamentosAmazon, ...STATE.lancamentosMercado];
+      const ops = ['amazon', 'mercado', 'petlove', 'shopee', 'outros'];
+      const all = ops.flatMap(o => STATE['lancamentos' + o.charAt(0).toUpperCase() + o.slice(1)] || []);
       const totalValor = all.reduce((s, l) => s + l.valor, 0);
       const pendentes = STATE.contasPagar.filter(c => c.status === 'pendente');
       const pagos = STATE.contasPagar.filter(c => c.status === 'pago');
       const totalPend = pendentes.reduce((s, c) => s + c.valor, 0);
       const totalPago = pagos.reduce((s, c) => s + c.valor, 0);
       const percPago = totalValor > 0 ? (totalPago / (totalPago + totalPend) * 100).toFixed(1) : 0;
-      
-      const valAmz = STATE.lancamentosAmazon.reduce((s, l) => s + l.valor, 0);
-      const valMlc = STATE.lancamentosMercado.reduce((s, l) => s + l.valor, 0);
-      const totalOps = (valAmz + valMlc) || 1;
 
-      // Data for Advanced Traction Chart
-      const statsPorMes = {};
-      const addVal = (mes, chave, val) => { if (!statsPorMes[mes]) statsPorMes[mes] = { amazon: 0, mercado: 0, pagos: 0 }; statsPorMes[mes][chave] += val; };
-      
-      STATE.lancamentosAmazon.forEach(l => addVal(l.data.slice(0, 7), 'amazon', l.valor));
-      STATE.lancamentosMercado.forEach(l => addVal(l.data.slice(0, 7), 'mercado', l.valor));
-      STATE.contasPagar.filter(c => c.status === 'pago').forEach(c => { if (c.dataPagamento) addVal(c.dataPagamento.slice(0, 7), 'pagos', c.valor); });
+      const pends = {};
+      ops.forEach(o => { pends[o] = pendentes.filter(c => c.origem === o).reduce((s, c) => s + c.valor, 0); });
 
-      const mesesOrd = Object.keys(statsPorMes).sort();
-      const maxValRel = Math.max(...mesesOrd.map(m => statsPorMes[m].amazon + statsPorMes[m].mercado), 1);
-      
-      return `<div>
-      <div style="margin-bottom:28px">
-        <h2 style="font-size:24px;font-weight:800;letter-spacing:-0.5px;color:var(--blue-dark)">Painel de Controle Estratégico</h2>
-        <p style="color:var(--text3);font-size:14px">Performance global e indicadores de tração operacional</p>
-      </div>
+      const filter = STATE.dashboardFilter;
+      const key = 'lancamentos' + filter.charAt(0).toUpperCase() + filter.slice(1);
+      const filteredAll = filter === 'all' ? all : (STATE[key] || []);
+      const displayTotal = filteredAll.reduce((s, l) => s + l.valor, 0);
+      const displayPend = filter === 'all' ? totalPend : (pends[filter] || 0);
 
-      <!-- KPI ROW -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:24px">
-        <div class="stat-card" style="border-left:4px solid var(--blue); position:relative; overflow:hidden">
-          <div class="stat-label">Movimentação Total</div>
-          <div class="stat-value">R$ ${totalValor.toLocaleString('pt-BR')}</div>
-          <div style="font-size:11px; color:var(--green); margin-top:4px; font-weight:700; display:flex; align-items:center; gap:3px">
-            <span style="font-size:14px">↑</span> 8.4% <span style="font-weight:400; color:var(--text3); font-size:10px">vs mês ant.</span>
-          </div>
-          <div style="position:absolute; right:-10px; bottom:-10px; opacity:0.05; font-size:60px">&#9672;</div>
+      const titulos = { all: 'Geral (Consolidado)', amazon: 'Amazon Logistics', mercado: 'Mercado Livre', petlove: 'Petlove', shopee: 'Shopee', outros: 'Outros Operations' };
+
+      return `<div class="animate-fade">
+      <div style="margin-bottom:24px; display:flex; justify-content:space-between; align-items:center">
+        <div>
+          <h2 style="font-size:22px; font-weight:700; color:var(--text-main)">Painel Executivo ${filter !== 'all' ? `— ${filter.toUpperCase()}` : ''}</h2>
+          <p style="color:var(--text-muted); font-size:13px">Gestão consolidada de 5 operações logísticas</p>
         </div>
-        <div class="stat-card" style="border-left:4px solid var(--green)">
-          <div class="stat-label">Total Liquidado</div>
-          <div class="stat-value" style="color:var(--green)">R$ ${totalPago.toLocaleString('pt-BR')}</div>
-          <div style="font-size:11px; color:var(--green); margin-top:4px; font-weight:700; display:flex; align-items:center; gap:3px">
-            <span style="font-size:14px">↑</span> 12.1% <span style="font-weight:400; color:var(--text3); font-size:10px">em liquidez</span>
-          </div>
-        </div>
-        <div class="stat-card" style="border-left:4px solid var(--red)">
-          <div class="stat-label">Pendência em Caixa</div>
-          <div class="stat-value" style="color:var(--red)">R$ ${totalPend.toLocaleString('pt-BR')}</div>
-          <div style="font-size:11px; color:var(--red); margin-top:4px; font-weight:700; display:flex; align-items:center; gap:3px">
-            <span style="font-size:14px">↓</span> 3.2% <span style="font-weight:400; color:var(--text3); font-size:10px">redução passiva</span>
-          </div>
-        </div>
-        <div class="stat-card" style="border-left:4px solid var(--yellow)">
-          <div class="stat-label">Eficiência de Fluxo</div>
-          <div class="stat-value" style="color:var(--yellow)">${percPago}%</div>
-          <div style="width:100%; height:4px; background:#f3f4f6; border-radius:2px; margin-top:10px; overflow:hidden">
-            <div style="width:${percPago}%; height:100%; background:var(--yellow)"></div>
-          </div>
-          <div style="font-size:10px; color:var(--text3); margin-top:5px; font-weight:600">Meta: 95%</div>
+        <div style="font-size:12px; color:var(--text-secondary); font-weight:600; background:var(--bg); padding:6px 12px; border-radius:6px; border:1px solid var(--border)">
+          Atualizado em: ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}
         </div>
       </div>
 
-      <!-- CHARTS ROW -->
-      <div style="display:grid;grid-template-columns: 2fr 1fr; gap:20px; margin-bottom:24px">
-        <!-- Evolução Mensal Bar Chart -->
-        <div class="card" style="min-height:380px; display:flex; flex-direction:column">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px">
-            <div>
-              <div style="font-size:15px; font-weight:700; color:var(--blue-dark)">Evolução Mensal de Pagamentos</div>
-              <div style="font-size:11px; color:var(--text3)">Volume financeiro processado por operação</div>
+      <!-- KPI Grid -->
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px">
+        <div class="stat-card" style="border-left: 4px solid var(--primary)">
+          <div class="stat-label">Movimentação ${filter === 'all' ? 'Geral' : (titulos[filter])}</div>
+          <div class="stat-value">R$ ${displayTotal.toLocaleString('pt-BR')}</div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:4px">Volume bruto processado</div>
+        </div>
+        
+        <div class="stat-card" style="border-left: 4px solid var(--danger)">
+          <div class="stat-label">Pendente ${filter === 'all' ? 'Total' : 'Operação'}</div>
+          <div class="stat-value" style="color:var(--danger)">R$ ${displayPend.toLocaleString('pt-BR')}</div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:4px">${pendentes.filter(c => filter === 'all' || c.origem === filter).length} pagamentos abertos</div>
+        </div>
+
+        <div class="stat-card" style="border-left: 4px solid var(--success)">
+          <div class="stat-label">Liquidação</div>
+          <div class="stat-value" style="color:var(--success)">R$ ${(filter === 'all' ? totalPago : pagos.filter(c => c.origem === filter).reduce((s,c)=>s+c.valor,0)).toLocaleString('pt-BR')}</div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:4px">Baixas confirmadas</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Eficiência Global</div>
+          <div class="stat-value">${percPago}%</div>
+          <div style="height:4px; background:var(--bg); border-radius:2px; margin-top:8px; overflow:hidden">
+            <div style="width:${percPago}%; height:100%; background:var(--primary)"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 240px 1fr; gap:24px; margin-bottom:24px">
+        <!-- Dashboard Internal Menu -->
+        <div style="display:flex; flex-direction:column; gap:6px">
+          <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px; padding-left:12px">Filtrar Visão</div>
+          <button class="btn-${filter === 'all' ? 'primary' : 'outline'}" style="width:100%; justify-content:flex-start; height:40px; font-size:12px; border-radius:6px" data-dash-filter="all">
+            <span style="width:20px; display:inline-block">📊</span> Visão Geral
+          </button>
+          <button class="btn-${filter === 'amazon' ? 'primary' : 'outline'}" style="width:100%; justify-content:flex-start; height:40px; font-size:12px; border-radius:6px" data-dash-filter="amazon">
+            <span style="width:20px; display:inline-block">📦</span> Amazon
+          </button>
+          <button class="btn-${filter === 'mercado' ? 'primary' : 'outline'}" style="width:100%; justify-content:flex-start; height:40px; font-size:12px; border-radius:6px" data-dash-filter="mercado">
+            <span style="width:20px; display:inline-block">🛒</span> Mercado Livre
+          </button>
+          <button class="btn-${filter === 'petlove' ? 'primary' : 'outline'}" style="width:100%; justify-content:flex-start; height:40px; font-size:12px; border-radius:6px" data-dash-filter="petlove">
+            <span style="width:20px; display:inline-block">🐕</span> Petlove
+          </button>
+          <button class="btn-${filter === 'shopee' ? 'primary' : 'outline'}" style="width:100%; justify-content:flex-start; height:40px; font-size:12px; border-radius:6px" data-dash-filter="shopee">
+            <span style="width:20px; display:inline-block">🛍️</span> Shopee
+          </button>
+          <button class="btn-${filter === 'outros' ? 'primary' : 'outline'}" style="width:100%; justify-content:flex-start; height:40px; font-size:12px; border-radius:6px" data-dash-filter="outros">
+            <span style="width:20px; display:inline-block">📁</span> Outros
+          </button>
+        </div>
+
+        <!-- Main Dashboard Content -->
+        <div>
+          ${filter === 'all' ? `
+            <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:12px; padding-left:4px">Volumes por Operação</div>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-bottom:24px">
+              ${ops.map(o => {
+                const vol = (STATE['lancamentos' + o.charAt(0).toUpperCase() + o.slice(1)] || []).reduce((s,l)=>s+l.valor,0);
+                const pend = pendentes.filter(c => c.origem === o).reduce((s,c)=>s+c.valor,0);
+                const colors = { amazon: 'var(--primary)', mercado: '#fbbf24', petlove: '#7c3aed', shopee: '#ea580c', outros: '#64748b' };
+                return `<div class="card" style="padding:16px; border-top: 3px solid ${colors[o] || '#cbd5e1'}">
+                  <div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:8px">${titulos[o]}</div>
+                  <div style="font-size:18px; font-weight:800; color:var(--text-main)">R$ ${vol.toLocaleString('pt-BR')}</div>
+                  <div style="font-size:11px; color:var(--danger); margin-top:4px; font-weight:600">Pendentes: R$ ${pend.toLocaleString('pt-BR')}</div>
+                </div>`;
+              }).join('')}
             </div>
-            <div style="display:flex; gap:12px">
-              <div style="display:flex; align-items:center; gap:5px"><div style="width:10px; height:10px; background:#2563EB; border-radius:2px"></div><span style="font-size:10px; font-weight:700">Amazon</span></div>
-              <div style="display:flex; align-items:center; gap:5px"><div style="width:10px; height:10px; background:#F59E0B; border-radius:2px"></div><span style="font-size:10px; font-weight:700">Mercado Livre</span></div>
+          ` : ''}
+
+          <div class="card" style="padding:0; overflow:hidden">
+            <div style="padding:16px 20px; border-bottom:1px solid var(--border); font-weight:700; font-size:14px; background:#f8fafc; display:flex; justify-content:space-between; align-items:center">
+              <span>Últimos Lançamentos — ${titulos[filter]}</span>
+              <button class="btn-outline" style="font-size:11px; padding:4px 10px" data-menu="${filter === 'all' ? 'relatorios' : filter}">Ver Tudo</button>
+            </div>
+            <div style="overflow-x:auto">
+              <table>
+                <thead>
+                  <tr><th>Data</th><th>Motorista</th><th>Base</th><th>Valor</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                  ${filteredAll.slice(0, 10).map(l => {
+                    let origem = 'outros';
+                    ops.forEach(o => { if ((STATE['lancamentos' + o.charAt(0).toUpperCase() + o.slice(1)] || []).includes(l)) origem = o; });
+                    const pago = findPaymentDate(null, l.motorista, l.valor, origem);
+                    const badgeClass = origem === 'amazon' ? 'badge-blue' : (origem === 'mercado' ? 'badge-yellow' : (origem === 'petlove' ? 'badge-purple' : (origem === 'shopee' ? 'badge-orange' : 'badge-gray')));
+                    return `<tr>
+                      <td style="font-size:11px; color:var(--text-muted)">${l.data}</td>
+                      <td style="font-weight:600; color:var(--text-main)">${l.motorista}</td>
+                      <td><span class="badge ${badgeClass}" style="font-size:10px">${origem.toUpperCase()}</span></td>
+                      <td><span class="badge badge-gray" style="font-size:10px">${l.base}</span></td>
+                      <td style="font-weight:700; color:var(--text-main)">R$ ${l.valor.toLocaleString('pt-BR')}</td>
+                      <td><span class="badge ${pago ? 'badge-green' : 'badge-yellow'}" style="font-size:10px">${pago ? 'LIQUIDADO' : 'PENDENTE'}</span></td>
+                    </tr>`;
+                  }).join('')}
+                </tbody>
+              </table>
             </div>
           </div>
-          
-          <div style="flex:1; display:flex; align-items:flex-end; gap:30px; padding:20px 10px; position:relative; min-height:220px">
-            <!-- Grid Lines -->
-            <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:space-between; padding-bottom:40px; pointer-events:none">
-              <div style="border-top:1px dashed #e2e8f0; width:100%"></div>
-              <div style="border-top:1px dashed #e2e8f0; width:100%"></div>
-              <div style="border-top:1px dashed #e2e8f0; width:100%"></div>
-              <div style="border-top:1px solid #cbd5e1; width:100%"></div>
-            </div>
 
-            ${(() => {
-              const maxMonthVal = Math.max(...mesesOrd.map(m => Math.max(statsPorMes[m].amazon, statsPorMes[m].mercado)), 1);
-              return mesesOrd.map(m => {
-                const hAmz = (statsPorMes[m].amazon / maxMonthVal * 100);
-                const hMlc = (statsPorMes[m].mercado / maxMonthVal * 100);
-                const format = (v) => v >= 1000 ? (v/1000).toFixed(1) + 'k' : v.toFixed(0);
-                return `<div style="flex:1; display:flex; flex-direction:column; align-items:center; position:relative; z-index:2">
-                  <div style="display:flex; align-items:flex-end; gap:5px; height:160px; width:100%; justify-content:center">
-                    <!-- Amz Bar -->
-                    <div style="width:25%; height:${hAmz}%; background:var(--blue); border-radius:4px 4px 0 0; position:relative; transition:all 0.3s" title="Amazon: R$ ${statsPorMes[m].amazon.toLocaleString('pt-BR')}">
-                      ${hAmz > 15 ? `<span style="position:absolute; top:-20px; left:50%; transform:translateX(-50%); font-size:9px; font-weight:800; color:var(--blue)">${format(statsPorMes[m].amazon)}</span>` : ''}
+          ${filter !== 'all' ? `
+            <div class="card" style="margin-top:24px">
+              <div style="font-weight:700; margin-bottom:20px; font-size:14px">Volume por Base — ${filter.toUpperCase()}</div>
+              ${(() => {
+                const porBase = {};
+                filteredAll.forEach(l => { porBase[l.base] = (porBase[l.base] || 0) + l.valor; });
+                const sorted = Object.entries(porBase).sort((a,b) => b[1] - a[1]);
+                const max = Math.max(...Object.values(porBase), 1);
+                const barColor = { amazon: 'var(--primary)', mercado: '#fbbf24', petlove: '#7c3aed', shopee: '#ea580c', outros: '#64748b' }[filter] || 'var(--primary)';
+                return sorted.map(([b, v]) => `
+                  <div style="margin-bottom:12px">
+                    <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px">
+                      <span>${b}</span>
+                      <span style="font-weight:700">R$ ${v.toLocaleString('pt-BR')}</span>
                     </div>
-                    <!-- Mlc Bar -->
-                    <div style="width:25%; height:${hMlc}%; background:var(--yellow); border-radius:4px 4px 0 0; position:relative; transition:all 0.3s" title="ML: R$ ${statsPorMes[m].mercado.toLocaleString('pt-BR')}">
-                      ${hMlc > 15 ? `<span style="position:absolute; top:-20px; left:50%; transform:translateX(-50%); font-size:9px; font-weight:800; color:var(--yellow)">${format(statsPorMes[m].mercado)}</span>` : ''}
+                    <div style="height:6px; background:#f1f5f9; border-radius:3px; overflow:hidden">
+                      <div style="width:${(v/max*100)}%; height:100%; background:${barColor}"></div>
                     </div>
                   </div>
-                  <div style="margin-top:12px; font-size:11px; font-weight:800; color:var(--text2); text-transform:uppercase">${m.split('-')[1]}<br><span style="font-size:9px; color:var(--text3)">${m.split('-')[0]}</span></div>
-                </div>`;
-              }).join('');
-            })()}
-          </div>
-        </div>
-
-        <!-- Donut Chart: Volume Share -->
-        <div class="card" style="display:flex; flex-direction:column; align-items:center; justify-content:center">
-          <div style="font-size:15px; font-weight:700; width:100%; margin-bottom:30px; color:var(--blue-dark)">Composição de Volume Operacional</div>
-          <div style="position:relative; width:190px; height:190px">
-            <svg viewBox="0 0 36 36" style="transform: rotate(-90deg); width:190px; height:190px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1))">
-              <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#f8fafc" stroke-width="4"></circle>
-              <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="var(--blue)" stroke-width="4" stroke-dasharray="${(valAmz/totalOps*100)} ${100 - (valAmz/totalOps*100)}" stroke-dashoffset="0" stroke-linecap="round"></circle>
-              <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="var(--yellow)" stroke-width="4" stroke-dasharray="${(valMlc/totalOps*100)} ${100 - (valMlc/totalOps*100)}" stroke-dashoffset="-${(valAmz/totalOps*100)}" stroke-linecap="round"></circle>
-            </svg>
-            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center">
-              <div style="font-size:11px; color:var(--text3); font-weight:700; text-transform:uppercase; letter-spacing:1px">Operado</div>
-              <div style="font-size:22px; font-weight:900; color:var(--blue-dark)">R$ ${Math.round(totalValor/1000)}k</div>
+                `).join('');
+              })()}
             </div>
-          </div>
-          <div style="margin-top:35px; width:100%">
-            <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:8px 12px; border-radius:8px; margin-bottom:10px">
-              <div style="display:flex; align-items:center; gap:10px"><div style="width:14px; height:14px; background:var(--blue); border-radius:4px; box-shadow:0 2px 4px rgba(37,99,235,0.3)"></div> <span style="font-size:13px; font-weight:700">Amazon</span></div>
-              <span style="font-size:13px; color:var(--text2); font-weight:800">${(valAmz/totalOps*100).toFixed(1)}%</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:8px 12px; border-radius:8px">
-              <div style="display:flex; align-items:center; gap:10px"><div style="width:14px; height:14px; background:var(--yellow); border-radius:4px; box-shadow:0 2px 4px rgba(245,158,11,0.3)"></div> <span style="font-size:13px; font-weight:700">Mercado Livre</span></div>
-              <span style="font-size:13px; color:var(--text2); font-weight:800">${(valMlc/totalOps*100).toFixed(1)}%</span>
-            </div>
-          </div>
+          ` : ''}
         </div>
       </div>
-    </div>
-
-    <!-- RECENT ACTIVITY MAP & BASE SUMMARY -->
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px">
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
-          <div style="font-size:15px; font-weight:700; color:var(--blue-dark)">Fluxo de Atividade (Últimos 28 dias)</div>
-          <div style="display:flex; align-items:center; gap:6px; font-size:10px; color:var(--text3); font-weight:700">
-            Sem atividade <div style="display:flex; gap:3px">
-              <div style="width:12px; height:12px; background:#f3f4f6; border-radius:2px"></div>
-              <div style="width:12px; height:12px; background:#93C5FD; border-radius:2px"></div>
-              <div style="width:12px; height:12px; background:#2563EB; border-radius:2px"></div>
-              <div style="width:12px; height:12px; background:#1E3A8A; border-radius:2px"></div>
-            </div> Alta intensidade
-          </div>
-        </div>
-        <div style="display:grid; grid-template-columns: repeat(7, 1fr); gap:8px">
-          ${Array.from({length: 28}, (_, i) => {
-            const d = new Date(); d.setDate(d.getDate() - (27 - i));
-            const ISO = d.toISOString().split('T')[0];
-            const hasOp = all.filter(l => l.data === ISO).length;
-            const color = hasOp > 5 ? '#1E3A8A' : hasOp > 2 ? '#2563EB' : hasOp > 0 ? '#93C5FD' : '#f3f4f6';
-            return `<div style="height:32px; background:${color}; border-radius:4px; transition:transform 0.2s; cursor:pointer" onmouseover="this.style.transform='scale(1.15)';this.style.zIndex='10'" onmouseout="this.style.transform='scale(1)'" title="${ISO}: ${hasOp} lançamentos"></div>`;
-          }).join('')}
-        </div>
-        <div style="display:flex; justify-content:space-between; margin-top:12px; font-size:11px; color:var(--text3); font-weight:700; text-transform:uppercase">
-          <span>Há 4 semanas</span>
-          <span>Atividade Recente</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <div style="font-size:15px; font-weight:700; margin-bottom:20px; color:var(--blue-dark)">Resumo de Performance por Base</div>
-        <table>
-          <thead><tr><th>Identificador</th><th>Volume (R$)</th><th style="text-align:center">Freq.</th></tr></thead>
-          <tbody>
-            ${(() => {
-              const res = {};
-              all.forEach(l => { const b = l.base || 'N/A'; res[b] = (res[b] || { v: 0, q: 0 }); res[b].v += l.valor; res[b].q += 1; });
-              return Object.entries(res).sort((a,b) => b[1].v - a[1].v).map(([name, d]) => `<tr>
-                <td style="font-weight:700; color:var(--text2)">${name}</td>
-                <td style="font-weight:600; color:var(--blue)">R$ ${d.v.toLocaleString('pt-BR')}</td>
-                <td style="text-align:center; font-size:12px; color:var(--text3)">${d.q} ops</td>
-              </tr>`).join('');
-            })()}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>`;
+    </div>`;
     }
 
     function buildLancamentos(tipo) {
       const tab = STATE.activeSubTab || 'locais';
-      const listaCompleta = tipo === 'amazon' ? STATE.lancamentosAmazon : STATE.lancamentosMercado;
-      const titulo = tipo === 'amazon' ? 'Amazon' : 'Mercado Livre';
+      const key = 'lancamentos' + tipo.charAt(0).toUpperCase() + tipo.slice(1);
+      const listaCompleta = STATE[key] || [];
+      const titulos = { amazon: 'Amazon', mercado: 'Mercado Livre', petlove: 'Petlove', shopee: 'Shopee', outros: 'Outros' };
+      const titulo = titulos[tipo] || tipo.toUpperCase();
       const podeEnviar = ['admin', 'supervisor'].includes(STATE.currentUser.role);
 
       const listaFiltrada = listaCompleta.filter(l => {
@@ -720,393 +775,789 @@
       const historico = listaFiltrada.filter(x => x.enviado);
       const exibe = tab === 'locais' ? pendentes : historico;
 
-      return `<div>
-    <div class="section-header">
-      <div><h2 style="font-size:20px;font-weight:700">Operações ${titulo}</h2><p style="color:var(--text3);font-size:13px">Lançamentos Locais e Histórico Enviado</p></div>
-      <div style="display:flex;gap:8px">
-        <button class="btn-success" id="btnEnviarFinOp" data-tipo="${tipo}" ${podeEnviar && pendentes.length > 0 ? '' : 'disabled'} style="${podeEnviar && pendentes.length > 0 ? '' : 'opacity:0.5'}">Enviar ${pendentes.length} ao Financeiro</button>
-        <button class="btn-outline" id="btnLoteLanc" data-tipo="${tipo}">+ Colar em Lote</button>
-        <button class="btn-primary" id="btnNovoLanc" data-tipo="${tipo}">+ Lançamento Único</button>
+      return `<div class="animate-fade">
+    <div class="section-header" style="margin-bottom:24px">
+      <div>
+        <h2 style="font-size:24px;font-weight:800;color:var(--primary)">Operações ${titulo}</h2>
+        <p style="color:var(--text-muted);font-size:14px">Gestão de lançamentos e fluxo operacional</p>
+      </div>
+      <div style="display:flex;gap:12px">
+        <button class="btn-success" id="btnEnviarFinOp" data-tipo="${tipo}" ${podeEnviar && pendentes.length > 0 ? '' : 'disabled'} style="${podeEnviar && pendentes.length > 0 ? '' : 'opacity:0.5; cursor:not-allowed'}">
+          🚀 Enviar ${pendentes.length} p/ Financeiro
+        </button>
+        <button class="btn-outline" id="btnLoteLanc" data-tipo="${tipo}">📂 Colar em Lote</button>
+        <button class="btn-primary" id="btnNovoLanc" data-tipo="${tipo}">+ Lançamento</button>
       </div>
     </div>
     
-    <div class="tab-bar">
-      <button class="tab${tab === 'locais' ? ' active' : ''}" data-subtab="locais">Mesa de Operação (${pendentes.length})</button>
-      <button class="tab${tab === 'historico' ? ' active' : ''}" data-subtab="historico">Histórico (${historico.length})</button>
+    <div style="display:flex; gap:8px; margin-bottom:24px; background:var(--border); padding:4px; border-radius:12px; width:fit-content">
+      <button class="tab${tab === 'locais' ? ' active' : ''}" data-subtab="locais" style="padding:8px 20px; border-radius:10px; border:none; background:${tab === 'locais' ? 'var(--card-bg)' : 'transparent'}; color:${tab === 'locais' ? 'var(--primary)' : 'var(--text-secondary)'}; font-weight:700; cursor:pointer">Mesa de Operação (${pendentes.length})</button>
+      <button class="tab${tab === 'historico' ? ' active' : ''}" data-subtab="historico" style="padding:8px 20px; border-radius:10px; border:none; background:${tab === 'historico' ? 'var(--card-bg)' : 'transparent'}; color:${tab === 'historico' ? 'var(--primary)' : 'var(--text-secondary)'}; font-weight:700; cursor:pointer">Histórico (${historico.length})</button>
     </div>
 
-    <div class="card">
-      <div style="margin-bottom:14px; display:flex; gap:10px; align-items:center; background:#f9fafb; padding:10px; border-radius:8px">
-        <input type="text" id="filterSearch" placeholder="🔍 Buscar motorista..." style="max-width:250px" value="${STATE.filters.search}">
-        <div style="display:flex; gap:5px; align-items:center">
-          <label style="font-size:11px; font-weight:700; color:var(--text3)">De:</label>
-          <input type="date" id="filterStart" style="width:130px" value="${STATE.filters.dataInicio}">
-          <label style="font-size:11px; font-weight:700; color:var(--text3)">Até:</label>
-          <input type="date" id="filterEnd" style="width:130px" value="${STATE.filters.dataFim}">
+    <div class="card" style="padding:0; overflow:hidden">
+      <div class="glass" style="padding:16px 20px; display:flex; gap:16px; align-items:center; border-bottom:1px solid var(--border)">
+        <div style="position:relative; flex:1; max-width:300px">
+          <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:0.5">🔍</span>
+          <input type="text" id="filterSearch" placeholder="Buscar motorista ou PIX..." style="padding-left:36px; width:100%" value="${STATE.filters.search}">
+        </div>
+        <div style="display:flex; gap:8px; align-items:center">
+          <span style="font-size:12px; font-weight:700; color:var(--text-muted)">PERÍODO:</span>
+          <input type="date" id="filterStart" style="width:140px" value="${STATE.filters.dataInicio}">
+          <span style="color:var(--text-muted)">→</span>
+          <input type="date" id="filterEnd" style="width:140px" value="${STATE.filters.dataFim}">
         </div>
       </div>
-      ${tab === 'locais' && !podeEnviar ? `<div style="margin-bottom:12px;font-size:12px;color:var(--text3)">❌ O envio de aprovação final de custos deve ser feito pelo supervisor. Até lá seus lançamentos estarão restritos a visualização local.</div>` : ''}
-      <table>
-        <thead><tr><th>Data</th><th>Motorista</th><th>Base</th><th>Chave PIX</th><th>Favorecido</th><th>Valor</th><th>Status</th><th id="thPgto">${tab === 'historico' ? 'Pago em' : ''}</th><th></th></tr></thead>
-        <tbody>
-          ${exibe.length === 0 ? '<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:20px">Nenhum registro nesta aba</td></tr>' : ''}
-          ${exibe.map(l => {
-        let statusHTML = '<span class="badge badge-yellow">Mesa de Operação</span>';
+      
+      ${tab === 'locais' && !podeEnviar ? `<div style="padding:12px 20px; background:rgba(239,68,68,0.05); border-bottom:1px solid var(--border); font-size:12px; color:var(--danger); font-weight:600">⚠️ O envio para aprovação deve ser realizado por um Supervisor.</div>` : ''}
+      
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Motorista</th>
+              <th>Base</th>
+              <th>Chave PIX</th>
+              <th>Favorecido</th>
+              <th>Valor</th>
+              <th>Status</th>
+              <th>${tab === 'historico' ? 'Pago em' : ''}</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${exibe.length === 0 ? '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:40px">Nenhum registro encontrado nesta aba</td></tr>' : ''}
+            ${exibe.map(l => {
+        let statusHTML = '<span class="badge badge-yellow">Mesa</span>';
         if (l.enviado) {
-          // Fazemos o link para saber o status no Caixa Financeiro
           const c = STATE.contasPagar.find(x => (l.contaId && x.id === l.contaId) || (!l.contaId && x.motorista === l.motorista && x.valor === l.valor && x.origem === tipo));
-          if (c && c.status === 'pago') statusHTML = '<span class="badge badge-green">✔ Liquidado (Pago)</span>';
-          else statusHTML = '<span class="badge badge-yellow" style="background:#fef08a;color:#854d0e">Aguardando Financeiro</span>';
+          if (c && c.status === 'pago') statusHTML = '<span class="badge badge-green">✔ Pago</span>';
+          else statusHTML = '<span class="badge badge-blue">Aguardando</span>';
         }
         const pgDate = findPaymentDate(l.id, l.motorista, l.valor, tipo);
         return `<tr>
-              <td><span class="badge badge-blue">${l.data}</span></td>
-              <td style="font-weight:500">${l.motorista}</td><td><span class="badge badge-gray">${l.base || 'N/A'}</span></td><td style="font-family:monospace;font-size:12px">${l.pix}</td><td>${l.favorecido}</td>
-              <td style="font-weight:600;color:var(--blue)">R$ ${l.valor.toLocaleString('pt-BR')}</td>
-              <td>${statusHTML}</td>
-              <td style="font-weight:600; color:var(--green)">${pgDate || ''}</td>
-              <td>${l.enviado ? '' : '<button class="btn-sm btn-outline" data-del-lanc="' + l.id + '" data-tipo="' + tipo + '">Excluir</button>'}</td>
-            </tr>`;
+                <td><span style="font-weight:700; color:var(--text-main)">${l.data}</span></td>
+                <td><div style="font-weight:600; color:var(--primary)">${l.motorista}</div></td>
+                <td><span class="badge badge-gray">${l.base || 'N/A'}</span></td>
+                <td style="font-family:'JetBrains Mono', monospace; font-size:12px">${l.pix}</td>
+                <td><span style="font-size:12px">${l.favorecido}</span></td>
+                <td><span style="font-weight:800; color:var(--text-main)">R$ ${l.valor.toLocaleString('pt-BR')}</span></td>
+                <td>${statusHTML}</td>
+                <td style="font-weight:700; color:var(--success)">${pgDate || ''}</td>
+                <td>
+                  <div style="display:flex;gap:6px">
+                    ${l.enviado ? '' : `<button class="btn-outline" style="padding:6px 12px; border-color:var(--danger); color:var(--danger)" data-del-lanc="${l.id}" data-tipo="${tipo}">Excluir</button>`}
+                    <button class="btn-outline" style="padding:6px 12px" data-extrato-mot="${l.motorista}">Extrato</button>
+                  </div>
+                </td>
+              </tr>`;
       }).join('')}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>`;
     }
+
+
+    function buildFechamento() {
+      const activeBase = STATE.activeSubTab || (STATE.bases[0]?.nome || '');
+      if (!STATE.activeSubTab && activeBase) STATE.activeSubTab = activeBase;
+
+      const motoristaDatalist = `<datalist id="dlMotoristas">${STATE.motoristas.filter(m => (m.operacao || 'amazon') === 'amazon').map(m => `<option value="${m.nome}">`).join('')}</datalist>`;
+
+      const listaCompleta = STATE.lancamentosFechamento.filter(l => l.base === activeBase);
+      
+      const listaFiltrada = listaCompleta.filter(l => {
+        const matchStart = !STATE.filters.dataInicio || l.data >= STATE.filters.dataInicio;
+        const matchEnd = !STATE.filters.dataFim || l.data <= STATE.filters.dataFim;
+        const matchMotorista = !STATE.filters.fechMotorista ? true : 
+                               (STATE.filters.fechMotorista === 'vazio' ? !l.motorista : l.motorista.toLowerCase().includes(STATE.filters.fechMotorista.toLowerCase()));
+        const matchLogin = !STATE.filters.fechLogin || l.login.toLowerCase().includes(STATE.filters.fechLogin.toLowerCase());
+        return matchStart && matchEnd && matchMotorista && matchLogin;
+      });
+
+      const totalGeralPeriodo = listaFiltrada.reduce((s, l) => s + l.total, 0);
+      const temFiltro = STATE.filters.dataInicio && STATE.filters.dataFim;
+
+      return `<div class="animate-fade">
+        <div class="section-header" style="margin-bottom:24px">
+          <div>
+            <h2 style="font-size:24px;font-weight:800;color:var(--primary)">Fechamento Amazon</h2>
+            <p style="color:var(--text-muted);font-size:14px">Gestão financeira de rotas por base (Operação Amazon)</p>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-bottom:24px; background:var(--border); padding:4px; border-radius:12px; width:fit-content; flex-wrap:wrap">
+          ${STATE.bases.map(b => `
+            <button class="tab${activeBase === b.nome ? ' active' : ''}" data-subtab="${b.nome}" style="padding:8px 20px; border-radius:10px; border:none; background:${activeBase === b.nome ? 'var(--card-bg)' : 'transparent'}; color:${activeBase === b.nome ? 'var(--primary)' : 'var(--text-secondary)'}; font-weight:700; cursor:pointer">
+              ${b.nome}
+            </button>`).join('')}
+        </div>
+
+        <div class="card" style="margin-bottom:24px">
+          <h3 style="font-size:16px; font-weight:700; margin-bottom:16px">Adicionar Nova Rota — Base ${activeBase}</h3>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:16px">
+            <div class="form-group">
+              <label>Data</label>
+              <input type="date" id="fFechData" value="${today()}">
+            </div>
+            <div class="form-group">
+              <label>Motorista</label>
+              <input type="text" id="fFechMotorista" list="dlMotoristas" placeholder="Busque ou digite...">
+            </div>
+            ${motoristaDatalist}
+            <div class="form-group">
+              <label>Login</label>
+              <input type="text" id="fFechLogin" placeholder="Login do motorista">
+            </div>
+            <div class="form-group">
+              <label>Tipo de Veículo</label>
+              <select id="fFechVeiculo">
+                <option value="">Selecione</option>
+                ${STATE.veiculos.map(v => `<option value="${v.tipo}">${v.tipo}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Cidade</label>
+              <select id="fFechCidade">
+                <option value="">Selecione</option>
+                ${STATE.cidades.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Claster (Opcional)</label>
+              <input type="text" id="fFechCluster" placeholder="Ex: C1">
+            </div>
+            <div class="form-group">
+              <label>Rota (R$)</label>
+              <input type="number" id="fFechRota" readonly style="background:var(--bg); color:var(--text-muted)">
+            </div>
+            <div class="form-group">
+              <label>Pedágio (R$)</label>
+              <input type="number" id="fFechPedagio" value="0" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>Adicional (R$)</label>
+              <input type="number" id="fFechAdicional" value="0" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>Combustível (Desconto R$)</label>
+              <input type="number" id="fFechCombustivel" value="0" step="0.01" style="border-color:var(--danger)">
+            </div>
+            <div class="form-group">
+              <label>Outros Descontos (R$)</label>
+              <input type="number" id="fFechDesconto" value="0" step="0.01" style="border-color:var(--danger)">
+            </div>
+            <div class="form-group">
+              <label>Justificativa Desconto</label>
+              <input type="text" id="fFechJustificativa" placeholder="Obrigatório se houver desconto">
+            </div>
+            <div class="form-group">
+              <label>Total Líquido (R$)</label>
+              <input type="number" id="fFechTotal" readonly style="background:var(--primary-light); color:var(--primary); font-weight:800">
+            </div>
+          </div>
+          <div style="display:flex; justify-content:flex-end; margin-top:16px; gap:12px">
+            <button class="btn-outline" id="btnLoteFech" style="padding:12px 24px">Importar em Lote</button>
+            <button class="btn-primary" id="btnAddRotaFech" style="padding:12px 32px">Adicionar Rota à Base</button>
+          </div>
+        </div>
+
+        <div class="card" style="padding:0; overflow:hidden">
+          <div class="glass" style="padding:16px 20px; display:flex; gap:16px; align-items:center; border-bottom:1px solid var(--border); flex-wrap:wrap">
+            <div style="display:flex; gap:8px; align-items:center">
+              <span style="font-size:12px; font-weight:700; color:var(--text-muted)">FILTRAR PERÍODO:</span>
+              <input type="date" id="filterStart" style="width:140px" value="${STATE.filters.dataInicio}">
+              <span style="color:var(--text-muted)">→</span>
+              <input type="date" id="filterEnd" style="width:140px" value="${STATE.filters.dataFim}">
+            </div>
+            <div style="display:flex; gap:8px; align-items:center">
+              <span style="font-size:12px; font-weight:700; color:var(--text-muted)">MOTORISTA:</span>
+              <input type="text" id="filterFechMotorista" list="dlMotoristas" style="width:160px; font-size:12px" value="${STATE.filters.fechMotorista === 'vazio' ? '[ VAZIO ]' : STATE.filters.fechMotorista}" placeholder="Todos ou [ VAZIO ]">
+            </div>
+            <div style="display:flex; gap:8px; align-items:center">
+              <span style="font-size:12px; font-weight:700; color:var(--text-muted)">LOGIN:</span>
+              <input type="text" id="filterFechLogin" style="width:100px; font-size:12px" value="${STATE.filters.fechLogin || ''}" placeholder="Filtrar login...">
+            </div>
+            ${temFiltro ? `
+              <div style="flex:1; display:flex; justify-content:flex-end; gap:24px; align-items:center">
+                <div style="text-align:right">
+                  <div style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:1px">Soma do Período</div>
+                  <div style="font-size:22px; font-weight:800; color:var(--primary)">R$ ${totalGeralPeriodo.toLocaleString('pt-BR')}</div>
+                </div>
+                <div style="display:flex; gap:10px">
+                  <button class="btn-outline" id="btnGerarArquivosMot" style="padding:12px 24px; font-size:14px; border-color:var(--primary); color:var(--primary)">
+                    📸 Gerar Arquivos p/ Motoristas
+                  </button>
+                  <button class="btn-success" id="btnEnviarSupervisao" style="padding:12px 24px; font-size:14px; box-shadow:0 8px 20px rgba(16, 185, 129, 0.2)">
+                    🚀 Enviar ${listaFiltrada.length} p/ Supervisão
+                  </button>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+
+          <div style="overflow-x:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Motorista</th>
+                  <th>Login</th>
+                  <th>Veículo</th>
+                  <th>Cidade</th>
+                  <th>Claster</th>
+                  <th>Rota</th>
+                  <th>Pedágio</th>
+                  <th>Adic.</th>
+                  <th>Comb. (-)</th>
+                  <th>Desc. (-)</th>
+                  <th>Total</th>
+                  <th style="text-align:right">Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${listaFiltrada.length === 0 ? `<tr><td colspan="14" style="text-align:center;color:var(--text-muted);padding:48px">
+                  ${temFiltro ? 'Nenhum registro para este período' : 'Selecione um período para visualizar/enviar dados'}
+                </td></tr>` : ''}
+                ${listaFiltrada.map(l => `<tr>
+                  <td style="font-size:11px; color:var(--text-muted)">${l.data}</td>
+                  <td style="font-weight:700; color:var(--primary)">${l.motorista}</td>
+                  <td><span class="badge badge-gray" style="font-size:10px">${l.login}</span></td>
+                  <td><span class="badge badge-blue" style="font-size:10px">${l.veiculo}</span></td>
+                  <td>${l.cidade}</td>
+                  <td><span class="badge badge-gray" style="font-size:10px">${l.cluster || '-'}</span></td>
+                  <td style="font-weight:600">R$ ${l.rota.toLocaleString('pt-BR')}</td>
+                  <td>R$ ${l.pedagio.toLocaleString('pt-BR')}</td>
+                  <td>R$ ${l.adicional.toLocaleString('pt-BR')}</td>
+                  <td style="color:var(--danger)">- R$ ${l.combustivel.toLocaleString('pt-BR')}</td>
+                  <td style="color:var(--danger)">
+                    - R$ ${(l.desconto || 0).toLocaleString('pt-BR')}
+                    ${l.justificativa ? `<br><small style="color:var(--text-muted); font-style:italic">"${l.justificativa}"</small>` : ''}
+                  </td>
+                  <td style="font-weight:800; color:var(--text-main)">R$ ${l.total.toLocaleString('pt-BR')}</td>
+                  <td style="text-align:right; display:flex; gap:4px; justify-content:flex-end">
+                    <button class="btn-outline" style="padding:4px 8px; font-size:10px; color:var(--primary); border-color:var(--primary)" data-edit-fech="${l.id}">Editar</button>
+                    <button class="btn-outline" style="padding:4px 8px; font-size:10px; color:var(--danger); border-color:var(--danger)" data-del-fech="${l.id}">Excluir</button>
+                  </td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>`;
+    }
+
 
     function buildFinanceiro() {
       const tab = STATE.activeSubTab || 'pagar';
       const pendentes = STATE.contasPagar.filter(c => c.status === 'pendente');
       const pagos = STATE.contasPagar.filter(c => c.status === 'pago');
-      return `<div>
-    <div class="section-header"><div><h2 style="font-size:20px;font-weight:700">Financeiro</h2><p style="color:var(--text3);font-size:13px">Contas a pagar e pagamentos realizados</p></div></div>
-    <div class="tab-bar">
-      <button class="tab${tab === 'pagar' ? ' active' : ''}" data-subtab="pagar">Contas a Pagar (${pendentes.length})</button>
-      <button class="tab${tab === 'pago' ? ' active' : ''}" data-subtab="pago">Realizados (${pagos.length})</button>
+      
+      return `<div class="animate-fade">
+    <div class="section-header" style="margin-bottom:24px">
+      <div>
+        <h2 style="font-size:24px;font-weight:800;color:var(--primary)">Financeiro</h2>
+        <p style="color:var(--text-muted);font-size:14px">Controle de liquidações e fluxo de caixa</p>
+      </div>
+      ${tab === 'pagar' ? `<button class="btn-success" id="btnPagarMarcados" style="display:none; box-shadow:0 8px 16px rgba(16,185,129,0.2)">✔ Liquidar Lote Selecionado</button>` : ''}
     </div>
 
-    <div style="margin-bottom:14px; display:flex; gap:10px; align-items:center; background:#fff; padding:15px; border-radius:10px; border:1px solid var(--gray-light)">
-      <input type="text" id="filterSearch" placeholder="🔍 Buscar beneficiário ou PIX..." style="max-width:300px" value="${STATE.filters.search}">
-      <div style="display:flex; gap:8px; align-items:center">
-        <label style="font-size:12px; font-weight:700; color:var(--text2)">Período:</label>
-        <input type="date" id="filterStart" style="width:140px" value="${STATE.filters.dataInicio}">
-        <input type="date" id="filterEnd" style="width:140px" value="${STATE.filters.dataFim}">
+    <div style="display:flex; gap:8px; margin-bottom:24px; background:var(--border); padding:4px; border-radius:12px; width:fit-content">
+      <button class="tab${tab === 'pagar' ? ' active' : ''}" data-subtab="pagar" style="padding:8px 20px; border-radius:10px; border:none; background:${tab === 'pagar' ? 'var(--card-bg)' : 'transparent'}; color:${tab === 'pagar' ? 'var(--primary)' : 'var(--text-secondary)'}; font-weight:700; cursor:pointer">A Pagar (${pendentes.length})</button>
+      <button class="tab${tab === 'pago' ? ' active' : ''}" data-subtab="pago" style="padding:8px 20px; border-radius:10px; border:none; background:${tab === 'pago' ? 'var(--card-bg)' : 'transparent'}; color:${tab === 'pago' ? 'var(--primary)' : 'var(--text-secondary)'}; font-weight:700; cursor:pointer">Realizados (${pagos.length})</button>
+    </div>
+
+    <div class="card" style="padding:0; overflow:hidden">
+      <div class="glass" style="padding:16px 20px; display:flex; gap:16px; align-items:center; border-bottom:1px solid var(--border); flex-wrap:wrap">
+        <div style="position:relative; flex:1; min-width:250px">
+          <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:0.5">🔍</span>
+          <input type="text" id="filterSearch" placeholder="Buscar beneficiário ou PIX..." style="padding-left:36px; width:100%" value="${STATE.filters.search}">
+        </div>
+        <div style="display:flex; gap:12px; align-items:center">
+          <select id="filterOrigemFin" style="width:140px">
+            <option value="">Operação (Todas)</option>
+            <option value="amazon" ${STATE.filters.origem === 'amazon' ? 'selected' : ''}>Amazon</option>
+            <option value="mercado" ${STATE.filters.origem === 'mercado' ? 'selected' : ''}>Mercado Livre</option>
+            <option value="petlove" ${STATE.filters.origem === 'petlove' ? 'selected' : ''}>Petlove</option>
+            <option value="shopee" ${STATE.filters.origem === 'shopee' ? 'selected' : ''}>Shopee</option>
+            <option value="outros" ${STATE.filters.origem === 'outros' ? 'selected' : ''}>Outros</option>
+            <option value="rh" ${STATE.filters.origem === 'rh' ? 'selected' : ''}>RH (Folha)</option>
+          </select>
+          <select id="filterBaseFin" style="width:140px">
+            <option value="">Base (Todas)</option>
+            ${STATE.bases.map(b => `<option value="${b.nome}"${STATE.filters.base === b.nome ? ' selected' : ''}>${b.nome}</option>`).join('')}
+          </select>
+          <div style="display:flex; gap:8px; align-items:center">
+            <input type="date" id="filterStart" style="width:140px" value="${STATE.filters.dataInicio}">
+            <span style="color:var(--text-muted)">→</span>
+            <input type="date" id="filterEnd" style="width:140px" value="${STATE.filters.dataFim}">
+          </div>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              ${tab === 'pagar' ? '<th style="width:40px"><input type="checkbox" id="chkAllFin"></th>' : ''}
+              <th>Beneficiário</th>
+              <th>Referência</th>
+              <th>Origem</th>
+              <th>Base</th>
+              <th>Valor</th>
+              <th>PIX / Conta</th>
+              <th>Status</th>
+              ${tab === 'pago' ? '<th>Data Pgto</th><th>Operador</th>' : '<th>Ação</th>'}
+            </tr>
+          </thead>
+          <tbody>
+            ${(tab === 'pagar' ? pendentes : pagos).length === 0 ? '<tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:40px">Nenhum registro encontrado</td></tr>' : ''}
+            ${(tab === 'pagar' ? pendentes : pagos).filter(c => {
+        const matchSearch = !STATE.filters.search || c.motorista.toLowerCase().includes(STATE.filters.search.toLowerCase()) || (c.pix && c.pix.toLowerCase().includes(STATE.filters.search.toLowerCase()));
+        const matchBase = !STATE.filters.base || c.base === STATE.filters.base;
+        const matchOrigem = !STATE.filters.origem || c.origem === STATE.filters.origem;
+        const matchStart = !STATE.filters.dataInicio || (tab === 'pagar' ? c.semana >= STATE.filters.dataInicio : c.dataPagamento >= STATE.filters.dataInicio);
+        const matchEnd = !STATE.filters.dataFim || (tab === 'pagar' ? c.semana <= STATE.filters.dataFim : c.dataPagamento <= STATE.filters.dataFim);
+        return matchSearch && matchBase && matchOrigem && matchStart && matchEnd;
+      }).map(c => `<tr>
+              ${tab === 'pagar' ? `<td><input type="checkbox" class="chk-fin" data-id="${c.id}"></td>` : ''}
+              <td><div style="font-weight:700; color:var(--primary)">${c.motorista}</div></td>
+              <td><span style="font-size:12px; font-weight:600">${c.semana}</span></td>
+              <td><span class="badge ${c.origem === 'amazon' ? 'badge-blue' : (c.origem === 'mercado' ? 'badge-yellow' : (c.origem === 'petlove' ? 'badge-purple' : (c.origem === 'shopee' ? 'badge-orange' : 'badge-gray')))}">${c.origem.toUpperCase()}</span></td>
+              <td><span class="badge badge-gray">${c.base || '-'}</span></td>
+              <td><span style="font-weight:800; color:var(--text-main)">R$ ${c.valor.toLocaleString('pt-BR')}</span></td>
+              <td><span style="font-family:'JetBrains Mono', monospace; font-size:11px">${c.pix || '-'}</span><br><span style="font-size:10px; color:var(--text-muted)">${c.favorecido || ''}</span></td>
+              <td><span class="badge ${c.status === 'pago' ? 'badge-green' : 'badge-yellow'}">${c.status.toUpperCase()}</span></td>
+              ${tab === 'pago' ? `
+                <td style="font-weight:700; color:var(--success)">${c.dataPagamento}</td>
+                <td style="font-size:11px; color:var(--text-muted)">${c.pagoBy}</td>
+              ` : `
+                <td><button class="btn-primary" style="padding:6px 12px; font-size:11px" data-pagar="${c.id}">Liquidar</button></td>
+              `}
+            </tr>`).join('')}
+          </tbody>
+        </table>
       </div>
     </div>
-    ${tab === 'pagar' ? `<div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="font-size:12px;color:var(--text3)">Mostrando ${pendentes.filter(c => {
-          const matchSearch = !STATE.filters.search || c.motorista.toLowerCase().includes(STATE.filters.search.toLowerCase()) || (c.pix && c.pix.toLowerCase().includes(STATE.filters.search.toLowerCase()));
-          return matchSearch;
-        }).length} de ${pendentes.length} pendentes.</div>
-        <button class="btn-success btn-sm" id="btnPagarMarcados" style="display:none">✔ Realizar Pagamento do Lote Selecionado</button>
-      </div>
-      <table>
-      <thead><tr><th style="width:40px"><input type="checkbox" id="chkAllFin" style="transform:scale(1.1)"></th><th>Beneficiário</th><th>Semana/Mês</th><th>Origem</th><th>Valor</th><th>Chave PIX / Boleto</th><th>Status</th><th></th></tr></thead>
-      <tbody>
-        ${pendentes.length === 0 ? '<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:20px">Nenhuma conta pendente</td></tr>' : ''}
-        ${pendentes.filter(c => {
-          const matchSearch = !STATE.filters.search || c.motorista.toLowerCase().includes(STATE.filters.search.toLowerCase()) || (c.pix && c.pix.toLowerCase().includes(STATE.filters.search.toLowerCase()));
-          const matchStart = !STATE.filters.dataInicio || c.semana >= STATE.filters.dataInicio;
-          const matchEnd = !STATE.filters.dataFim || c.semana <= STATE.filters.dataFim;
-          return matchSearch && matchStart && matchEnd;
-        }).map(c => `<tr>
-          <td><input type="checkbox" class="chk-fin" data-id="${c.id}" style="transform:scale(1.1)"></td>
-          <td style="font-weight:500">${c.motorista}</td><td>${c.semana}</td>
-          <td><span class="badge ${c.origem === 'amazon' ? 'badge-blue' : c.origem === 'rh' ? 'badge-gray' : c.origem === 'rh_vr' ? 'badge-green' : 'badge-yellow'}">${c.origem === 'amazon' ? 'Amazon' : c.origem === 'rh' ? 'RH Folha' : c.origem === 'rh_vr' ? 'RH VR' : 'Mercado Livre'}</span></td>
-          <td style="font-weight:600;color:var(--blue)">R$ ${c.valor.toLocaleString('pt-BR')}</td>
-          <td>${c.pix ? `<span style="font-family:monospace;font-size:12px">${c.pix}</span>` : '<span class="badge badge-red">Pendente</span>'}</td>
-          <td><span class="badge badge-yellow">Pendente</span></td>
-          <td><button class="btn-sm btn-success" data-pagar="${c.id}">Pagar Único</button></td>
-        </tr>`).join('')}
-      </tbody></table></div>`
-          : `<div class="card"><table>
-      <thead><tr><th>Beneficiário</th><th>Semana/Mês</th><th>Origem</th><th>Valor</th><th>PIX / Boleto</th><th>Data Pgto</th><th>Pago por</th></tr></thead>
-      <tbody>
-        ${pagos.length === 0 ? '<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:20px">Nenhum pagamento realizado</td></tr>' : ''}
-        ${pagos.filter(c => {
-          const matchSearch = !STATE.filters.search || c.motorista.toLowerCase().includes(STATE.filters.search.toLowerCase()) || (c.pix && c.pix.toLowerCase().includes(STATE.filters.search.toLowerCase()));
-          const matchStart = !STATE.filters.dataInicio || (c.dataPagamento && c.dataPagamento >= STATE.filters.dataInicio);
-          const matchEnd = !STATE.filters.dataFim || (c.dataPagamento && c.dataPagamento <= STATE.filters.dataFim);
-          return matchSearch && matchStart && matchEnd;
-        }).map(c => `<tr>
-          <td style="font-weight:500">${c.motorista}</td><td>${c.semana}</td>
-          <td><span class="badge ${c.origem === 'amazon' ? 'badge-blue' : c.origem === 'rh' ? 'badge-gray' : c.origem === 'rh_vr' ? 'badge-green' : 'badge-yellow'}">${c.origem === 'amazon' ? 'Amazon' : c.origem === 'rh' ? 'RH Folha' : c.origem === 'rh_vr' ? 'RH VR' : 'Mercado Livre'}</span></td>
-          <td style="font-weight:600;color:var(--green)">R$ ${c.valor.toLocaleString('pt-BR')}</td>
-          <td style="font-family:monospace;font-size:12px">${c.pix || '-'}</td>
-          <td>${c.dataPagamento || '-'}</td>
-          <td style="font-size:12px;color:var(--text3)">${c.pagoBy || '-'}</td>
-        </tr>`).join('')}
-      </tbody></table></div>`}
   </div>`;
     }
+
 
     function buildRH() {
-      return `<div>
-    <div class="section-header">
+      return `<div class="animate-fade">
+    <div class="section-header" style="margin-bottom:24px">
       <div>
-        <h2 style="font-size:20px;font-weight:700">Recursos Humanos</h2>
-        <p style="color:var(--text3);font-size:13px">Gestão Global de Funcionários e Contratos</p>
+        <h2 style="font-size:24px;font-weight:800;color:var(--primary)">Recursos Humanos</h2>
+        <p style="color:var(--text-muted);font-size:14px">Gestão de colaboradores e contratos corporativos</p>
       </div>
-      <button class="btn-primary" id="btnNovoFunc">+ Novo Funcionário</button>
+      <button class="btn-primary" id="btnNovoFunc" style="box-shadow:0 8px 16px rgba(37,99,235,0.2)">+ Novo Colaborador</button>
     </div>
-    <div class="card"><table>
-      <thead><tr><th>Nome</th><th>Cargo</th><th>Salário Base</th><th>VT</th><th>Total Base</th><th>PIX</th><th>Admissão / Contrato</th><th>Status</th><th></th></tr></thead>
-      <tbody>${STATE.funcionarios.map(f => `<tr>
-        <td style="font-weight:500">${f.nome}</td><td>${f.cargo}</td>
-        <td>R$ ${f.salario.toLocaleString('pt-BR')}</td><td>R$ ${f.vt}</td>
-        <td style="font-weight:600;color:var(--blue)">R$ ${(f.salario + f.vt).toLocaleString('pt-BR')}</td>
-        <td style="font-family:monospace;font-size:12px">${f.pix || '-'}</td>
-        <td style="font-size:12px">
-          ${f.admissao}
-          <div style="margin-top:6px">
-            ${f.contratoUrl ? `<a href="${f.contratoUrl}" target="_blank" class="badge badge-blue" style="text-decoration:none" download="Contrato_${f.nome.replace(/ /g, '_')}">&#128196; Baixar Contrato</a>` : `<span class="badge badge-gray">Sem contrato</span>`}
-          </div>
-        </td>
-        <td><span class="badge ${f.status === 'ativo' ? 'badge-green' : 'badge-gray'}">${f.status}</span></td>
-        <td><button class="btn-sm btn-outline" data-edit-func="${f.id}">Editar</button></td>
-      </tr>`).join('')}</tbody></table></div>
+
+    <div class="card" style="padding:0; overflow:hidden">
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Colaborador</th>
+              <th>Cargo / Função</th>
+              <th>Salário Base</th>
+              <th>V.T. / Benefícios</th>
+              <th>Custo Total</th>
+              <th>Chave PIX</th>
+              <th>Contrato</th>
+              <th>Status</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${STATE.funcionarios.map(f => `<tr>
+              <td><div style="font-weight:700; color:var(--primary)">${f.nome}</div></td>
+              <td><span class="badge badge-blue">${f.cargo}</span></td>
+              <td>R$ ${f.salario.toLocaleString('pt-BR')}</td>
+              <td>R$ ${f.vt}</td>
+              <td><span style="font-weight:800; color:var(--text-main)">R$ ${(f.salario + f.vt).toLocaleString('pt-BR')}</span></td>
+              <td style="font-family:'JetBrains Mono', monospace; font-size:11px">${f.pix || '-'}</td>
+              <td>
+                <div style="display:flex; flex-direction:column; gap:4px">
+                  <span style="font-size:10px; font-weight:700; color:var(--text-muted)">ADM: ${f.admissao}</span>
+                  ${f.contratoUrl ? `<a href="${f.contratoUrl}" target="_blank" class="badge badge-blue" style="text-decoration:none; text-align:center" download="Contrato_${f.nome.replace(/ /g, '_')}">📄 Ver Contrato</a>` : `<span class="badge badge-gray">Sem anexo</span>`}
+                </div>
+              </td>
+              <td><span class="badge ${f.status === 'ativo' ? 'badge-green' : 'badge-red'}">${f.status.toUpperCase()}</span></td>
+              <td><button class="btn-outline" style="padding:6px 12px" data-edit-func="${f.id}">Editar</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>`;
     }
+
 
     function buildCadastros() {
       const tab = STATE.activeSubTab || 'motoristas';
-      return `<div>
-    <div class="section-header">
-      <div><h2 style="font-size:20px;font-weight:700">Cadastros</h2><p style="color:var(--text3);font-size:13px">Motoristas, cidades e veículos</p></div>
-      <button class="btn-primary" id="btnNovoCad" data-tipo="${tab}">+ Novo</button>
+      const opFilter = STATE.filters.opFilter || 'amazon';
+      if (tab === 'motoristas' && !STATE.filters.opFilter) STATE.filters.opFilter = 'amazon';
+
+      return `<div class="animate-fade">
+    <div class="section-header" style="margin-bottom:24px">
+      <div>
+        <h2 style="font-size:24px;font-weight:800;color:var(--primary)">Configurações do Sistema</h2>
+        <p style="color:var(--text-muted);font-size:14px">Gestão de motoristas, frotas e unidades operacionais</p>
+      </div>
+      <button class="btn-primary" id="btnNovoCad" data-tipo="${tab}">+ Novo Registro</button>
     </div>
-    <div class="tab-bar">
-      <button class="tab${tab === 'motoristas' ? ' active' : ''}" data-subtab="motoristas">Motoristas</button>
-      <button class="tab${tab === 'bases' ? ' active' : ''}" data-subtab="bases">Bases</button>
-      <button class="tab${tab === 'cidades' ? ' active' : ''}" data-subtab="cidades">Cidades</button>
-      <button class="tab${tab === 'veiculos' ? ' active' : ''}" data-subtab="veiculos">Veículos</button>
+
+    <div style="display:flex; gap:8px; margin-bottom:24px; background:var(--border); padding:4px; border-radius:12px; width:fit-content; flex-wrap:wrap">
+      <button class="tab${tab === 'motoristas' ? ' active' : ''}" data-subtab="motoristas" style="padding:8px 20px; border-radius:10px; border:none; background:${tab === 'motoristas' ? 'var(--card-bg)' : 'transparent'}; color:${tab === 'motoristas' ? 'var(--primary)' : 'var(--text-secondary)'}; font-weight:700; cursor:pointer">Motoristas</button>
+      <button class="tab${tab === 'bases' ? ' active' : ''}" data-subtab="bases" style="padding:8px 20px; border-radius:10px; border:none; background:${tab === 'bases' ? 'var(--card-bg)' : 'transparent'}; color:${tab === 'bases' ? 'var(--primary)' : 'var(--text-secondary)'}; font-weight:700; cursor:pointer">Unidades / Bases</button>
+      <button class="tab${tab === 'cidades' ? ' active' : ''}" data-subtab="cidades" style="padding:8px 20px; border-radius:10px; border:none; background:${tab === 'cidades' ? 'var(--card-bg)' : 'transparent'}; color:${tab === 'cidades' ? 'var(--primary)' : 'var(--text-secondary)'}; font-weight:700; cursor:pointer">Cidades Atendidas</button>
+      <button class="tab${tab === 'veiculos' ? ' active' : ''}" data-subtab="veiculos" style="padding:8px 20px; border-radius:10px; border:none; background:${tab === 'veiculos' ? 'var(--card-bg)' : 'transparent'}; color:${tab === 'veiculos' ? 'var(--primary)' : 'var(--text-secondary)'}; font-weight:700; cursor:pointer">Tipos de Veículo</button>
+      <button class="tab${tab === 'precos' ? ' active' : ''}" data-subtab="precos" style="padding:8px 20px; border-radius:10px; border:none; background:${tab === 'precos' ? 'var(--card-bg)' : 'transparent'}; color:${tab === 'precos' ? 'var(--primary)' : 'var(--text-secondary)'}; font-weight:700; cursor:pointer">💰 Tabela de Preços</button>
     </div>
-    ${tab === 'motoristas' ? `<div class="card"><table>
-      <thead><tr><th>Nome</th><th>Telefone</th><th>Cidade Base</th><th>Base Atrelada</th><th>Veículo</th><th>Chave PIX</th><th>Status</th><th></th></tr></thead>
-      <tbody>${STATE.motoristas.map(m => `<tr>
-        <td style="font-weight:500">${m.nome}</td><td>${m.telefone}</td><td>${m.cidade}</td>
-        <td><span class="badge badge-blue">${m.baseAtrelada || 'Não definida'}</span></td>
-        <td>${m.veiculo}</td>
-        <td>${m.pix ? `<span style="font-family:monospace;font-size:12px">${m.pix}</span>` : '<span class="badge badge-red">Não cadastrada</span>'}</td>
-        <td style="font-size:12px">${m.contratoUrl ? `<a href="${m.contratoUrl}" target="_blank" class="badge badge-blue" style="text-decoration:none" download="Contrato_${m.nome.replace(/ /g, '_')}">&#128196; Baixar</a>` : `<span class="badge badge-gray">Sem contrato</span>`}</td>
-        <td><span class="badge ${m.status === 'ativo' ? 'badge-green' : 'badge-gray'}">${m.status}</span></td>
-        <td><button class="btn-sm btn-outline" data-edit-mot="${m.id}">Editar</button></td>
-      </tr>`).join('')}</tbody></table></div>`
-            : tab === 'bases' ? `<div class="card"><table>
-      <thead><tr><th>Nome da Base</th><th></th></tr></thead>
-      <tbody>${STATE.bases.map(b => `<tr>
-        <td style="font-weight:600; color:var(--blue)">${b.nome}</td>
-        <td style="text-align:right">
-          <button class="btn-sm btn-outline" data-edit-base="${b.id}">Editar</button>
-          <button class="btn-sm btn-outline" style="color:var(--red); border-color:var(--red)" data-del-base="${b.id}">Excluir</button>
-        </td>
-      </tr>`).join('')}</tbody></table></div>`
-            : tab === 'cidades' ? `<div class="card"><table>
-      <thead><tr><th>Cidade</th><th></th></tr></thead>
-      <tbody>${STATE.cidades.map(c => `<tr>
-        <td style="font-weight:500">${c.nome}</td>
-        <td style="text-align:right">
-          <button class="btn-sm btn-outline" data-edit-cid="${c.id}">Editar</button>
-          <button class="btn-sm btn-outline" style="color:var(--red); border-color:var(--red)" data-del-cid="${c.id}">Excluir</button>
-        </td>
-      </tr>`).join('')}</tbody></table></div>`
-            : `<div class="card"><table>
-      <thead><tr><th>Tipo de Veículo</th><th></th></tr></thead>
-      <tbody>${STATE.veiculos.map(v => `<tr>
-        <td style="font-weight:500">${v.tipo}</td>
-        <td style="text-align:right">
-          <button class="btn-sm btn-outline" data-edit-vei="${v.id}">Editar</button>
-          <button class="btn-sm btn-outline" style="color:var(--red); border-color:var(--red)" data-del-vei="${v.id}">Excluir</button>
-        </td>
-      </tr>`).join('')}</tbody></table></div>`}
+
+    ${tab === 'motoristas' ? `
+      <div style="display:flex; gap:12px; margin-bottom:16px; align-items:center">
+        <span style="font-size:11px; font-weight:800; color:var(--text-muted)">FILTRAR OPERAÇÃO:</span>
+        <div style="display:flex; gap:4px; background:var(--bg); padding:4px; border-radius:8px">
+          ${['amazon', 'mercado', 'petlove', 'shopee', 'outros'].map(op => `
+            <button class="btn-filter-op${opFilter === op ? ' active' : ''}" data-filter-op="${op}" style="padding:6px 12px; font-size:11px; border-radius:6px; background:${opFilter === op ? 'var(--primary)' : 'transparent'}; color:${opFilter === op ? '#fff' : 'var(--text-secondary)'}">
+              ${op.toUpperCase()}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    ` : ''}
+
+    <div class="card" style="padding:0; overflow:hidden">
+      <div style="overflow-x:auto">
+        ${tab === 'motoristas' ? `
+          <table>
+            <thead>
+              <tr>
+                <th>Motorista</th>
+                <th>Operação</th>
+                <th>Cidade / Base</th>
+                <th>Veículo</th>
+                <th>PIX</th>
+                <th>Status</th>
+                <th style="text-align:right">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${STATE.motoristas.filter(m => (m.operacao || 'amazon') === opFilter).map(m => `<tr>
+                <td><div style="font-weight:700; color:var(--primary)">${m.nome}</div><div style="font-size:10px; color:var(--text-muted)">${m.telefone}</div></td>
+                <td><span class="badge ${m.operacao === 'amazon' ? 'badge-blue' : (m.operacao === 'mercado' ? 'badge-yellow' : 'badge-gray')}">${(m.operacao || 'amazon').toUpperCase()}</span></td>
+                <td>
+                  <div style="font-weight:600; font-size:12px">${m.cidade}</div>
+                  <span class="badge badge-gray" style="font-size:9px">${m.baseAtrelada || 'SEM BASE'}</span>
+                </td>
+                <td><span class="badge badge-blue">${m.veiculo}</span></td>
+                <td>
+                  <div style="font-family:'JetBrains Mono', monospace; font-size:11px">${m.pix || '-'}</div>
+                  <div style="font-size:10px; color:var(--text-muted)">${m.favorecido || m.nome}</div>
+                </td>
+                <td><span class="badge ${m.status === 'ativo' ? 'badge-green' : 'badge-red'}">${m.status.toUpperCase()}</span></td>
+                <td style="text-align:right"><button class="btn-outline" style="padding:6px 12px" data-edit-mot="${m.id}">Editar</button></td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        ` : tab === 'bases' ? `
+          <table>
+            <thead><tr><th>Nome da Base Operacional</th><th style="text-align:right">Gerenciamento</th></tr></thead>
+            <tbody>
+              ${STATE.bases.map(b => `<tr>
+                <td><div style="font-weight:700; color:var(--primary); font-size:16px">${b.nome}</div></td>
+                <td style="text-align:right">
+                  <button class="btn-outline" style="padding:6px 16px" data-edit-base="${b.id}">Editar</button>
+                  <button class="btn-outline" style="padding:6px 16px; color:var(--danger); border-color:var(--danger)" data-del-base="${b.id}">Excluir</button>
+                </td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        ` : tab === 'cidades' ? `
+          <table>
+            <thead><tr><th>Cidade</th><th style="text-align:right">Gerenciamento</th></tr></thead>
+            <tbody>
+              ${STATE.cidades.map(c => `<tr>
+                <td style="font-weight:700; color:var(--primary)">${c.nome}</td>
+                <td style="text-align:right">
+                  <button class="btn-outline" style="padding:6px 16px" data-edit-cid="${c.id}">Editar</button>
+                  <button class="btn-outline" style="padding:6px 16px; color:var(--danger); border-color:var(--danger)" data-del-cid="${c.id}">Excluir</button>
+                </td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        ` : tab === 'precos' ? `
+          <table>
+            <thead>
+              <tr>
+                <th>Base</th>
+                <th>Veículo</th>
+                <th>Cidade</th>
+                <th>Valor da Rota</th>
+                <th style="text-align:right">Gerenciamento</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${STATE.tabelaPrecos.map(p => `<tr>
+                <td><span class="badge badge-blue">${p.base}</span></td>
+                <td><span class="badge badge-gray">${p.veiculo}</span></td>
+                <td><div style="font-weight:700; color:var(--primary)">${p.cidade}</div></td>
+                <td><span style="font-weight:800; color:var(--text-main)">R$ ${p.valor.toLocaleString('pt-BR')}</span></td>
+                <td style="text-align:right">
+                  <button class="btn-outline" style="padding:6px 16px" data-edit-preco="${p.id}">Editar</button>
+                  <button class="btn-outline" style="padding:6px 16px; color:var(--danger); border-color:var(--danger)" data-del-preco="${p.id}">Excluir</button>
+                </td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        ` : `
+          <table>
+            <thead><tr><th>Tipo de Veículo / Categoria</th><th style="text-align:right">Gerenciamento</th></tr></thead>
+            <tbody>
+              ${STATE.veiculos.map(v => `<tr>
+                <td><div style="font-weight:700; color:var(--primary)">${v.tipo}</div></td>
+                <td style="text-align:right">
+                  <button class="btn-outline" style="padding:6px 16px" data-edit-vei="${v.id}">Editar</button>
+                  <button class="btn-outline" style="padding:6px 16px; color:var(--danger); border-color:var(--danger)" data-del-vei="${v.id}">Excluir</button>
+                </td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        `}
+      </div>
+    </div>
   </div>`;
     }
 
+
     function buildContratos() {
-      return `<div>
-    <div class="section-header">
+      return `<div class="animate-fade">
+    <div class="section-header" style="margin-bottom:24px">
       <div>
-        <h2 style="font-size:20px;font-weight:700">Contratos da Empresa</h2>
-        <p style="color:var(--text3);font-size:13px">Gestão de parceiros, clientes e prestadores de serviço</p>
+        <h2 style="font-size:24px;font-weight:800;color:var(--primary)">Contratos da Empresa</h2>
+        <p style="color:var(--text-muted);font-size:14px">Gestão de parceiros, clientes e prestadores de serviço</p>
       </div>
-      <button class="btn-primary" id="btnNovoContr">+ Novo Contrato</button>
+      <button class="btn-primary" id="btnNovoContr" style="box-shadow:0 8px 16px rgba(37,99,235,0.2)">+ Novo Contrato</button>
     </div>
-    <div class="card"><table>
-      <thead><tr><th>Parceiro / Cliente</th><th>CNPJ</th><th>Tipo de Relação</th><th>Vigência</th><th>Valor Base</th><th>Documento</th><th>Status</th><th></th></tr></thead>
-      <tbody>
-        ${STATE.contratosEmpresa.length === 0 ? '<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:20px">Nenhum contrato cadastrado</td></tr>' : ''}
-        ${STATE.contratosEmpresa.map(c => `<tr>
-        <td style="font-weight:500">${c.parceiro}</td><td style="font-family:monospace;font-size:12px">${c.cnpj || '-'}</td><td><span class="badge badge-gray">${c.tipo}</span></td><td>${c.vigencia}</td>
-        <td style="font-weight:600;color:var(--blue)">R$ ${(c.valorBase || 0).toLocaleString('pt-BR')}</td>
-        <td style="font-size:12px">${c.contratoUrl ? `<a href="${c.contratoUrl}" target="_blank" class="badge badge-blue" style="text-decoration:none" download="Contrato_${c.parceiro.replace(/ /g, '_')}">&#128196; Download PDF</a>` : `<span class="badge badge-gray">Sem anexo</span>`}</td>
-        <td><span class="badge ${c.status === 'ativo' ? 'badge-green' : 'badge-gray'}">${c.status}</span></td>
-        <td><button class="btn-sm btn-outline" data-edit-contr="${c.id}">Editar</button></td>
-      </tr>`).join('')}</tbody></table></div>
+
+    <div class="card" style="padding:0; overflow:hidden">
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Parceiro / Cliente</th>
+              <th>Documento (CNPJ)</th>
+              <th>Tipo de Relação</th>
+              <th>Vigência</th>
+              <th>Valor Base</th>
+              <th>Anexo</th>
+              <th>Status</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${STATE.contratosEmpresa.length === 0 ? '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:40px">Nenhum contrato cadastrado</td></tr>' : ''}
+            ${STATE.contratosEmpresa.map(c => `<tr>
+              <td><div style="font-weight:700; color:var(--primary)">${c.parceiro}</div></td>
+              <td style="font-family:'JetBrains Mono', monospace; font-size:12px">${c.cnpj || '-'}</td>
+              <td><span class="badge badge-gray">${c.tipo}</span></td>
+              <td><span style="font-size:12px; font-weight:600">${c.vigencia}</span></td>
+              <td><span style="font-weight:800; color:var(--text-main)">R$ ${(c.valorBase || 0).toLocaleString('pt-BR')}</span></td>
+              <td>
+                ${c.contratoUrl ? `<a href="${c.contratoUrl}" target="_blank" class="badge badge-blue" style="text-decoration:none; text-align:center" download="Contrato_${c.parceiro.replace(/ /g, '_')}">📄 PDF</a>` : `<span class="badge badge-gray">Sem anexo</span>`}
+              </td>
+              <td><span class="badge ${c.status === 'ativo' ? 'badge-green' : 'badge-red'}">${c.status.toUpperCase()}</span></td>
+              <td><button class="btn-outline" style="padding:6px 12px" data-edit-contr="${c.id}">Editar</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>`;
     }
+
 
     function buildRelatorios() {
       const tab = STATE.activeSubTab || 'producao';
       const allLanc = [...STATE.lancamentosAmazon, ...STATE.lancamentosMercado];
       const porMot = {};
       allLanc.forEach(l => { if (!porMot[l.motorista]) porMot[l.motorista] = { valor: 0, qtd: 0 }; porMot[l.motorista].valor += l.valor; porMot[l.motorista].qtd += 1; });
-      return `<div>
-    <div class="section-header">
-      <div><h2 style="font-size:20px;font-weight:700">Relatórios</h2></div>
-      <div style="display:flex;gap:8px">
-        <button class="btn-outline btn-sm" id="btnExportProd">&#8595; Produção CSV</button>
-        <button class="btn-outline btn-sm" id="btnExportFin">&#8595; Financeiro CSV</button>
-        <button class="btn-outline btn-sm" id="btnExportRH">&#8595; Folha RH CSV</button>
+      
+      return `<div class="animate-fade">
+    <div class="section-header" style="margin-bottom:24px">
+      <div>
+        <h2 style="font-size:24px;font-weight:800;color:var(--primary)">Relatórios de Inteligência</h2>
+        <p style="color:var(--text-muted);font-size:14px">Análise de dados e exportação para auditoria</p>
+      </div>
+      <div style="display:flex;gap:12px">
+        <button class="btn-outline" id="btnExportProd" style="padding:8px 16px">📥 Produção CSV</button>
+        <button class="btn-outline" id="btnExportFin" style="padding:8px 16px">📥 Financeiro CSV</button>
+        <button class="btn-outline" id="btnExportRH" style="padding:8px 16px">📥 Folha RH CSV</button>
       </div>
     </div>
-    <div class="tab-bar">
+
+    <div style="display:flex; gap:8px; margin-bottom:24px; background:var(--border); padding:4px; border-radius:12px; width:fit-content">
       ${(() => {
         const r = STATE.currentUser.role;
         const tabs = [];
-        if (['admin', 'supervisor'].includes(r)) { tabs.push({ id: 'amazon_rep', label: 'Amazon por Base' }, { id: 'mercado_rep', label: 'Mercado Livre por Base' }); }
-        if (['admin', 'op_rh'].includes(r)) { tabs.push({ id: 'rh', label: 'Relatório RH' }); }
-        if (['admin', 'op_financeiro'].includes(r)) { tabs.push({ id: 'financeiro', label: 'Fluxo Financeiro' }); }
-        if (r === 'admin') tabs.push({ id: 'producao', label: 'Histórico Geral' });
+        if (['admin', 'supervisor'].includes(r)) { tabs.push({ id: 'amazon_rep', label: 'Amazon' }, { id: 'mercado_rep', label: 'M. Livre' }); }
+        if (['admin', 'op_rh'].includes(r)) { tabs.push({ id: 'rh', label: 'RH' }); }
+        if (['admin', 'op_financeiro'].includes(r)) { tabs.push({ id: 'financeiro', label: 'Financeiro' }); }
+        if (r === 'admin') tabs.push({ id: 'producao', label: 'Geral' });
         
-        return tabs.map(t => `<button class="tab${tab === t.id ? ' active' : ''}" data-subtab="${t.id}">${t.label}</button>`).join('');
+        return tabs.map(t => `
+          <button class="tab${tab === t.id ? ' active' : ''}" data-subtab="${t.id}" style="padding:8px 20px; border-radius:10px; border:none; background:${tab === t.id ? 'var(--card-bg)' : 'transparent'}; color:${tab === t.id ? 'var(--primary)' : 'var(--text-secondary)'}; font-weight:700; cursor:pointer">
+            ${t.label}
+          </button>`).join('');
       })()}
     </div>
-    ${tab === 'producao' ? `<div class="card">
-      <div style="font-size:14px;font-weight:600;margin-bottom:14px">Valores acumulados por motorista</div>
-      <table><thead><tr><th>Motorista</th><th>Nº Lançamentos Realizados</th><th>Valor Total Consolidado</th></tr></thead>
-      <tbody>${Object.entries(porMot).map(([nome, d]) => `<tr>
-        <td style="font-weight:500">${nome}</td><td style="text-align:center">${d.qtd} vez(es)</td>
-        <td style="font-weight:600;color:var(--blue)">R$ ${d.valor.toLocaleString('pt-BR')}</td>
-      </tr>`).join('')}</tbody></table></div>`
-            : tab === 'amazon_rep' || tab === 'mercado_rep' ? (() => {
-              const tipo = tab === 'amazon_rep' ? 'amazon' : 'mercado';
-              const lista = tipo === 'amazon' ? STATE.lancamentosAmazon : STATE.lancamentosMercado;
-              
-              // Agrupamento por Base
-              const porBase = {};
-              lista.forEach(l => { const b = l.base || 'N/A'; if (!porBase[b]) porBase[b] = { valor: 0, qtd: 0 }; porBase[b].valor += l.valor; porBase[b].qtd += 1; });
-              const maxBaseVal = Math.max(...Object.values(porBase).map(x => x.valor), 1);
 
-              // Agrupamento por Mês
-              const mesesMap = { '01': 'Jan', '02': 'Fev', '03': 'Mar', '04': 'Abr', '05': 'Mai', '06': 'Jun', '07': 'Jul', '08': 'Ago', '09': 'Set', '10': 'Out', '11': 'Nov', '12': 'Dez' };
-              const porMes = {};
-              lista.forEach(l => {
-                const mesKey = l.data.slice(0, 7); // YYYY-MM
-                if (!porMes[mesKey]) porMes[mesKey] = 0;
-                porMes[mesKey] += l.valor;
-              });
-              const mesesSorted = Object.keys(porMes).sort(); // Ordenar meses
-              const maxMesVal = Math.max(...Object.values(porMes), 1);
+    ${(() => {
+      if (tab === 'producao') {
+        return `<div class="card" style="padding:0; overflow:hidden">
+          <div style="padding:20px; border-bottom:1px solid var(--border); background:#f8fafc">
+            <h3 style="font-size:16px; font-weight:700; color:var(--text-main)">Acumulado por Motorista</h3>
+          </div>
+          <div style="overflow-x:auto">
+            <table>
+              <thead>
+                <tr><th>Motorista</th><th style="text-align:center">Nº Operações</th><th>Valor Total Consolidado</th></tr>
+              </thead>
+              <tbody>
+                ${Object.entries(porMot).map(([nome, d]) => `<tr>
+                  <td><div style="font-weight:700; color:var(--primary)">${nome}</div></td>
+                  <td style="text-align:center"><span class="badge badge-gray">${d.qtd} vez(es)</span></td>
+                  <td><span style="font-weight:800; color:var(--text-main)">R$ ${d.valor.toLocaleString('pt-BR')}</span></td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>`;
+      }
+      
+      if (tab === 'amazon_rep' || tab === 'mercado_rep') {
+        const tipo = tab === 'amazon_rep' ? 'amazon' : 'mercado';
+        const lista = tipo === 'amazon' ? STATE.lancamentosAmazon : STATE.lancamentosMercado;
+        const porBase = {};
+        lista.forEach(l => { const b = l.base || 'N/A'; if (!porBase[b]) porBase[b] = { valor: 0, qtd: 0 }; porBase[b].valor += l.valor; porBase[b].qtd += 1; });
+        const maxBaseVal = Math.max(...Object.values(porBase).map(x => x.valor), 1);
 
-              return `<div>
-                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px">
-                  <div class="stat-card"><div class="stat-label">Total Gasto ${tipo.toUpperCase()}</div><div class="stat-value" style="color:var(--blue);font-size:22px">R$ ${lista.reduce((s, l) => s + l.valor, 0).toLocaleString('pt-BR')}</div></div>
-                  <div class="stat-card"><div class="stat-label">Bases Operando</div><div class="stat-value">${Object.keys(porBase).length}</div></div>
-                  <div class="stat-card"><div class="stat-label">Total Lançamentos</div><div class="stat-value">${lista.length}</div></div>
-                </div>
+        return `<div style="display:grid; grid-template-columns: 1fr; gap:24px">
+          <div class="card" style="padding:0; overflow:hidden">
+            <div style="padding:20px; border-bottom:1px solid var(--border); background:#f8fafc">
+              <h3 style="font-size:16px; font-weight:700; color:var(--text-main)">Volume por Base - ${tipo.toUpperCase()}</h3>
+            </div>
+            <div style="overflow-x:auto">
+              <table>
+                <thead>
+                  <tr><th>Base Operacional</th><th style="text-align:center">Total Operações</th><th>Total Financeiro</th></tr>
+                </thead>
+                <tbody>
+                  ${Object.entries(porBase).map(([base, d]) => `<tr>
+                    <td><div style="font-weight:700; color:var(--primary)">${base}</div></td>
+                    <td style="text-align:center"><span class="badge badge-gray">${d.qtd}</span></td>
+                    <td><span style="font-weight:800; color:var(--text-main)">R$ ${d.valor.toLocaleString('pt-BR')}</span></td>
+                  </tr>`).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>`;
+      }
 
-                <!-- Gráfico de Evolução Mensal -->
-                <div class="card" style="margin-bottom:20px; background: linear-gradient(to bottom, #ffffff, #fdfdfd)">
-                  <div style="font-size:14px; font-weight:700; margin-bottom:20px; color:var(--blue-dark)">Evolução Mensal de Custos</div>
-                  <div style="display:flex; align-items:flex-end; gap:20px; height:200px; padding-bottom:25px; border-bottom:1px solid #eee; margin-bottom:10px">
-                    ${mesesSorted.map(mKey => {
-                      const [ano, mes] = mKey.split('-');
-                      const valor = porMes[mKey];
-                      const altura = (valor / maxMesVal * 150) + 20;
-                      return `
-                        <div style="flex:1; display:flex; flex-direction:column; align-items:center; position:relative">
-                          <div style="font-size:10px; font-weight:700; color:var(--blue); margin-bottom:5px">R$ ${Math.round(valor/1000)}k</div>
-                          <div style="width:100%; max-width:40px; height:${altura}px; background: linear-gradient(to top, var(--blue), #60a5fa); border-radius:6px 6px 0 0; transition: all 0.3s; box-shadow: 0 4px 6px -1px rgba(37,99,235,0.2)" title="R$ ${valor.toLocaleString('pt-BR')}"></div>
-                          <div style="position:absolute; bottom:-25px; font-size:11px; font-weight:600; color:var(--text3)">${mesesMap[mes]}</div>
-                        </div>`;
-                    }).join('')}
-                    ${mesesSorted.length === 0 ? '<div style="flex:1; text-align:center; color:var(--text3); font-size:13px">Sem dados históricos para exibir gráfico</div>' : ''}
-                  </div>
-                </div>
+      if (tab === 'financeiro') {
+        const totalPago = STATE.contasPagar.filter(c => c.status === 'pago').reduce((s, c) => s + c.valor, 0);
+        const totalPend = STATE.contasPagar.filter(c => c.status === 'pendente').reduce((s, c) => s + c.valor, 0);
+        return `<div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:32px">
+            <div class="stat-card">
+              <div class="stat-label">Total Liquidado</div>
+              <div class="stat-value" style="color:var(--success)">R$ ${totalPago.toLocaleString('pt-BR')}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Total em Aberto</div>
+              <div class="stat-value" style="color:var(--danger)">R$ ${totalPend.toLocaleString('pt-BR')}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Fluxo Bruto</div>
+              <div class="stat-value">R$ ${(totalPago + totalPend).toLocaleString('pt-BR')}</div>
+            </div>
+          </div>
+        </div>`;
+      }
 
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px">
-                  <!-- Gráfico por Base (Compacto) -->
-                  <div class="card">
-                    <div style="font-size:13px;font-weight:700;margin-bottom:15px;color:var(--text)">Distribuição por Base</div>
-                    ${Object.entries(porBase).sort((a,b) => b[1].valor - a[1].valor).map(([base, d]) => {
-                      const perc = (d.valor / maxBaseVal * 100).toFixed(0);
-                      return `<div style="margin-bottom:12px">
-                        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
-                          <span style="font-weight:600">${base}</span>
-                          <span style="color:var(--text3)">R$ ${d.valor.toLocaleString('pt-BR')}</span>
-                        </div>
-                        <div style="width:100%;height:6px;background:#f3f4f6;border-radius:3px;overflow:hidden">
-                          <div style="width:${perc}%;height:100%;background:var(--blue);border-radius:3px"></div>
-                        </div>
-                      </div>`;
-                    }).join('')}
-                  </div>
-
-                  <!-- Tabela Detalhada -->
-                  <div class="card">
-                    <div style="font-size:13px;font-weight:700;margin-bottom:15px;color:var(--text)">Resumo Financeiro</div>
-                    <table style="font-size:12px">
-                      <thead><tr><th>Base</th><th style="text-align:center">Qtd</th><th>Total</th></tr></thead>
-                      <tbody>${Object.entries(porBase).map(([base, d]) => `<tr><td style="font-weight:600">${base}</td><td style="text-align:center">${d.qtd}</td><td style="font-weight:700;color:var(--blue)">R$ ${d.valor.toLocaleString('pt-BR')}</td></tr>`).join('')}</tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>`;
-            })()
-          : tab === 'financeiro' ? `<div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px">
-        <div class="stat-card"><div class="stat-label">Total Pago</div><div class="stat-value" style="color:var(--green);font-size:22px">R$ ${STATE.contasPagar.filter(c => c.status === 'pago').reduce((s, c) => s + c.valor, 0).toLocaleString('pt-BR')}</div></div>
-        <div class="stat-card"><div class="stat-label">Total Pendente</div><div class="stat-value" style="color:var(--red);font-size:22px">R$ ${STATE.contasPagar.filter(c => c.status === 'pendente').reduce((s, c) => s + c.valor, 0).toLocaleString('pt-BR')}</div></div>
-        <div class="stat-card"><div class="stat-label">Total Geral de Transações</div><div class="stat-value" style="font-size:22px">R$ ${STATE.contasPagar.reduce((s, c) => s + c.valor, 0).toLocaleString('pt-BR')}</div></div>
-      </div></div>`
-            : `<div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
-        <div class="stat-card"><div class="stat-label">Custo Mensal Total (S/ VR)</div><div class="stat-value" style="color:var(--blue);font-size:22px">R$ ${STATE.funcionarios.filter(f => f.status === 'ativo').reduce((s, f) => s + f.salario + f.vt, 0).toLocaleString('pt-BR')}</div></div>
-        <div class="stat-card"><div class="stat-label">Funcionários Ativos</div><div class="stat-value">${STATE.funcionarios.filter(f => f.status === 'ativo').length}</div></div>
-      </div>
-      <div class="card"><table>
-        <thead><tr><th>Funcionário</th><th>Cargo</th><th>Salário</th><th>VT</th><th>Total Mensal (S/ VR)</th></tr></thead>
-        <tbody>${STATE.funcionarios.filter(f => f.status === 'ativo').map(f => `<tr>
-          <td style="font-weight:500">${f.nome}</td><td>${f.cargo}</td>
-          <td>R$ ${f.salario.toLocaleString('pt-BR')}</td><td>R$ ${(f.vt).toLocaleString('pt-BR')}</td>
-          <td style="font-weight:600;color:var(--blue)">R$ ${(f.salario + f.vt).toLocaleString('pt-BR')}</td>
-        </tr>`).join('')}</tbody></table></div></div>`}
+      return `<div class="card" style="padding:60px; text-align:center">
+        <div style="font-size:48px; margin-bottom:20px">📊</div>
+        <h3 style="color:var(--text-muted)">Relatório em processamento...</h3>
+      </div>`;
+    })()}
   </div>`;
     }
+
 
     function buildAdministracao() {
       const tab = STATE.activeSubTab || 'usuarios';
-      return `<div>
-    <div class="section-header">
-      <div><h2 style="font-size:20px;font-weight:700">Administração</h2><p style="color:var(--text3);font-size:13px">Usuários, permissões e log</p></div>
+      return `<div class="animate-fade">
+    <div class="section-header" style="margin-bottom:24px">
+      <div>
+        <h2 style="font-size:24px;font-weight:800;color:var(--primary)">Centro de Administração</h2>
+        <p style="color:var(--text-muted);font-size:14px">Segurança, usuários e auditoria do sistema</p>
+      </div>
       ${tab === 'usuarios' ? '<button class="btn-primary" id="btnNovoUser">+ Novo Usuário</button>' : ''}
     </div>
-    <div class="tab-bar">
-      <button class="tab${tab === 'usuarios' ? ' active' : ''}" data-subtab="usuarios">Usuários</button>
-      <button class="tab${tab === 'logs' ? ' active' : ''}" data-subtab="logs">Log de Ações</button>
+
+    <div style="display:flex; gap:8px; margin-bottom:24px; background:var(--border); padding:4px; border-radius:12px; width:fit-content">
+      <button class="tab${tab === 'usuarios' ? ' active' : ''}" data-subtab="usuarios" style="padding:8px 20px; border-radius:10px; border:none; background:${tab === 'usuarios' ? 'var(--card-bg)' : 'transparent'}; color:${tab === 'usuarios' ? 'var(--primary)' : 'var(--text-secondary)'}; font-weight:700; cursor:pointer">Gestão de Usuários</button>
+      <button class="tab${tab === 'logs' ? ' active' : ''}" data-subtab="logs" style="padding:8px 20px; border-radius:10px; border:none; background:${tab === 'logs' ? 'var(--card-bg)' : 'transparent'}; color:${tab === 'logs' ? 'var(--primary)' : 'var(--text-secondary)'}; font-weight:700; cursor:pointer">Logs de Auditoria</button>
     </div>
-    ${tab === 'usuarios' ? `<div class="card"><table>
-      <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Status</th><th>Cadastrado em</th><th></th></tr></thead>
-      <tbody>${STATE.users.map(u => `<tr>
-        <td style="font-weight:500">${u.name}</td><td style="font-size:12px">${u.email}</td>
-        <td><span class="badge ${ROLES[u.role]?.color || 'badge-gray'}">${ROLES[u.role]?.label || u.role}</span></td>
-        <td><span class="badge ${u.active ? 'badge-green' : 'badge-gray'}">${u.active ? 'Ativo' : 'Inativo'}</span></td>
-        <td style="font-size:12px;color:var(--text3)">${u.createdAt}</td>
-        <td style="display:flex;gap:6px">
-          <button class="btn-sm btn-outline" data-edit-user="${u.id}">Editar</button>
-          <button class="btn-sm btn-warning" data-reset-pass="${u.id}">Resetar Senha</button>
-        </td>
-      </tr>`).join('')}</tbody></table></div>`
-          : `<div class="card"><table>
-      <thead><tr><th>Data/Hora</th><th>Usuário</th><th>Ação</th></tr></thead>
-      <tbody>${STATE.logs.map(l => `<tr>
-        <td style="font-size:12px;color:var(--text3);white-space:nowrap">${l.data}</td>
-        <td style="font-weight:500;white-space:nowrap">${l.usuario}</td>
-        <td>${l.acao}</td>
-      </tr>`).join('')}</tbody></table></div>`}
+
+    <div class="card" style="padding:0; overflow:hidden">
+      <div style="overflow-x:auto">
+        ${tab === 'usuarios' ? `
+          <table>
+            <thead>
+              <tr><th>Nome Completo</th><th>E-mail Corporativo</th><th>Perfil de Acesso</th><th>Status</th><th>Último Acesso</th><th>Ações</th></tr>
+            </thead>
+            <tbody>
+              ${STATE.users.map(u => `<tr>
+                <td><div style="font-weight:700; color:var(--primary)">${u.name}</div></td>
+                <td>${u.email}</td>
+                <td><span class="badge badge-blue">${ROLES[u.role]?.label || u.role}</span></td>
+                <td><span class="badge ${u.active !== false ? 'badge-green' : 'badge-red'}">${u.active !== false ? 'ATIVO' : 'INATIVO'}</span></td>
+                <td style="font-size:11px; color:var(--text-muted)">${u.createdAt || '-'}</td>
+                <td>
+                  <div style="display:flex; gap:8px">
+                    <button class="btn-outline" style="padding:4px 10px" data-edit-user="${u.id}">Editar</button>
+                    <button class="btn-outline" style="padding:4px 10px; color:var(--warning); border-color:var(--warning)" data-reset-pass="${u.id}">Reset</button>
+                  </div>
+                </td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        ` : `
+          <table>
+            <thead>
+              <tr><th>Timestamp</th><th>Usuário</th><th>Ação Realizada</th></tr>
+            </thead>
+            <tbody>
+              ${STATE.logs.map(l => `<tr>
+                <td style="font-size:12px; color:var(--text-muted); white-space:nowrap; font-family:'JetBrains Mono', monospace">${l.data}</td>
+                <td style="font-weight:700; color:var(--text-main)">${l.usuario}</td>
+                <td style="font-size:13px">${l.acao}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        `}
+      </div>
+    </div>
   </div>`;
     }
+
 
     function buildModal() {
       const m = STATE.modal; if (!m) return ''; let content = '';
@@ -1122,7 +1573,8 @@
         <div class="form-group"><label>Nome do Favorecido</label><input id="fFavAssoc" placeholder="Favorecido da Conta"></div>
       </div>
         <div class="form-group"><label>Valor Total do Custo (R$)</label><input type="number" id="fValorLivre" placeholder="Ex: 120.50"></div>
-      <div class="form-group"><label>Base</label><select id="fBaseLivre"><option value="ELP7">ELP7</option><option value="ESV8">ESV8</option><option value="VRR9">VRR9</option></select></div>
+      <div class="form-group"><label>Base</label><select id="fBaseLivre">${STATE.bases.map(b => `<option value="${b.nome}">${b.nome}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Observação (opcional)</label><input id="fObsLivre" placeholder="Ex: Entrega atrasada, devolução, etc."></div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
         <button class="btn-outline" id="btnCancelModal">Cancelar</button>
         <button class="btn-primary" id="btnSalvarUnico">Salvar Lançamento</button>
@@ -1141,9 +1593,20 @@
       </div>`;
       }
       if (m.type === 'novoMotorista' || m.type === 'editMotorista') {
-        const d = m.data || { nome: '', telefone: '', cidade: '', veiculo: 'Moto', pix: '', status: 'ativo', contratoUrl: '' };
+        const d = m.data || { nome: '', telefone: '', cidade: '', veiculo: 'Moto', pix: '', favorecido: '', status: 'ativo', operacao: 'amazon', contratoUrl: '' };
         content = `<h3 style="font-size:16px;font-weight:700;margin-bottom:18px">${m.type === 'novoMotorista' ? 'Novo Motorista' : 'Editar Motorista'}</h3>
-      <div class="form-group"><label>Nome Completo</label><input id="fNome" value="${d.nome}"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Nome Completo</label><input id="fNome" value="${d.nome}"></div>
+        <div class="form-group"><label>Operação</label>
+          <select id="fOperacaoMot">
+            <option value="amazon"${d.operacao === 'amazon' ? ' selected' : ''}>Amazon</option>
+            <option value="mercado"${d.operacao === 'mercado' ? ' selected' : ''}>Mercado Livre</option>
+            <option value="petlove"${d.operacao === 'petlove' ? ' selected' : ''}>Petlove</option>
+            <option value="shopee"${d.operacao === 'shopee' ? ' selected' : ''}>Shopee</option>
+            <option value="outros"${d.operacao === 'outros' ? ' selected' : ''}>Outros</option>
+          </select>
+        </div>
+      </div>
       <div class="form-row">
         <div class="form-group"><label>Telefone</label><input id="fTel" value="${d.telefone}"></div>
         <div class="form-group"><label>Cidade Base</label><select id="fCidadeBase">${STATE.cidades.map(c => `<option${d.cidade === c.nome ? ' selected' : ''}>${c.nome}</option>`).join('')}</select></div>
@@ -1155,8 +1618,9 @@
       </div>
       <div class="form-row">
         <div class="form-group"><label>Chave PIX</label><input id="fPix" value="${d.pix}" placeholder="CPF, e-mail, telefone ou chave aleatória"></div>
-        <div class="form-group"><label>Upload de Contrato (Opcional)</label><input type="file" id="fMotContrato" accept=".pdf,.doc,.docx" style="padding:6px;font-size:12px;background:#f9fafb">${d.contratoUrl ? `<div style="font-size:11px;color:var(--text3);margin-top:4px">Contrato anexado, envie outro para substituir.</div>` : ''}</div>
+        <div class="form-group"><label>Favorecido (PIX)</label><input id="fFavorecidoMot" value="${d.favorecido || ''}" placeholder="Nome do titular da conta"></div>
       </div>
+      <div class="form-group"><label>Upload de Contrato (Opcional)</label><input type="file" id="fMotContrato" accept=".pdf,.doc,.docx" style="padding:6px;font-size:12px;background:#f9fafb">${d.contratoUrl ? `<div style="font-size:11px;color:var(--text3);margin-top:4px">Contrato anexado, envie outro para substituir.</div>` : ''}</div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
         <button class="btn-outline" id="btnCancelModal">Cancelar</button>
         <button class="btn-primary" id="btnSalvarMot">Salvar</button>
@@ -1211,7 +1675,22 @@
       </div>`;
       }
       if (m.type === 'novoUser' || m.type === 'editUser') {
-        const d = m.data || { name: '', email: '', password: '', role: 'op_amazon', active: true };
+        const d = m.data || { name: '', email: '', password: '', role: 'op_amazon', active: true, permissions: [] };
+        const modules = [
+          { id: 'dashboard', label: 'Dashboard' },
+          { id: 'amazon', label: 'Amazon' },
+          { id: 'mercado', label: 'Mercado Livre' },
+          { id: 'petlove', label: 'Petlove' },
+          { id: 'shopee', label: 'Shopee' },
+          { id: 'outros', label: 'Outros' },
+          { id: 'fechamento', label: 'Fechamento Amazon' },
+          { id: 'rh', label: 'RH' },
+          { id: 'financeiro', label: 'Financeiro' },
+          { id: 'cadastros', label: 'Cadastros' },
+          { id: 'relatorios', label: 'Relatórios' },
+          { id: 'contratos', label: 'Contratos' },
+          { id: 'administracao', label: 'Administração' }
+        ];
         content = `<h3 style="font-size:16px;font-weight:700;margin-bottom:18px">${m.type === 'novoUser' ? 'Novo Usuário' : 'Editar Usuário'}</h3>
       <div class="form-row">
         <div class="form-group"><label>Nome Completo</label><input id="fUserName" value="${d.name}"></div>
@@ -1219,9 +1698,22 @@
       </div>
       <div class="form-row">
         <div class="form-group"><label>Senha${m.type === 'editUser' ? ' (branco = não alterar)' : ''}</label><input id="fUserPass" type="password" placeholder="••••••••"></div>
-        <div class="form-group"><label>Perfil</label><select id="fUserRole">${Object.entries(ROLES).map(([k, v]) => `<option value="${k}"${d.role === k ? ' selected' : ''}>${v.label}</option>`).join('')}</select></div>
+        <div class="form-group"><label>Perfil Base</label><select id="fUserRole">${Object.entries(ROLES).map(([k, v]) => `<option value="${k}"${d.role === k ? ' selected' : ''}>${v.label}</option>`).join('')}</select></div>
       </div>
       <div class="form-group"><label>Status</label><select id="fUserStatus"><option value="1"${d.active ? ' selected' : ''}>Ativo</option><option value="0"${!d.active ? ' selected' : ''}>Inativo</option></select></div>
+      
+      <div style="margin-top:10px; margin-bottom:15px">
+        <label style="display:block; font-size:12px; font-weight:600; color:var(--text2); margin-bottom:8px">Módulos Permitidos:</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; background:#f9fafb; padding:12px; border-radius:8px; border:1px solid #eee">
+          ${modules.map(mod => `
+            <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer">
+              <input type="checkbox" class="fUserPerm" value="${mod.id}" ${d.permissions.includes(mod.id) || d.role === 'admin' ? 'checked' : ''} style="width:auto">
+              ${mod.label}
+            </label>
+          `).join('')}
+        </div>
+      </div>
+
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
         <button class="btn-outline" id="btnCancelModal">Cancelar</button>
         <button class="btn-primary" id="btnSalvarUser">Salvar</button>
@@ -1284,6 +1776,83 @@
         <button class="btn-primary" id="btnCancelModal">OK, entendi</button>
       </div>`;
       }
+      if (m.type === 'novoPreco' || m.type === 'editPreco') {
+        const d = m.data || { base: '', veiculo: 'UTILITARIOS', cidade: '', valor: 0 };
+        content = `<h3 style="font-size:16px;font-weight:700;margin-bottom:18px">${m.type === 'novoPreco' ? 'Configurar Novo Preço' : 'Editar Preço de Rota'}</h3>
+        <div class="form-group"><label>Base Operacional</label><select id="fPrecoBase">${STATE.bases.map(b => `<option${d.base === b.nome ? ' selected' : ''}>${b.nome}</option>`).join('')}</select></div>
+        <div class="form-row">
+          <div class="form-group"><label>Tipo de Veículo</label><select id="fPrecoVei">${STATE.veiculos.map(v => `<option value="${v.tipo}"${d.veiculo === v.tipo ? ' selected' : ''}>${v.tipo}</option>`).join('')}</select></div>
+          <div class="form-group"><label>Cidade</label><select id="fPrecoCid">${STATE.cidades.map(c => `<option${d.cidade === c.nome ? ' selected' : ''}>${c.nome}</option>`).join('')}</select></div>
+        </div>
+        <div class="form-group"><label>Valor da Rota (R$)</label><input type="number" id="fPrecoValor" value="${d.valor}"></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+          <button class="btn-outline" id="btnCancelModal">Cancelar</button>
+          <button class="btn-primary" id="btnSalvarPreco">Salvar Configuração</button>
+        </div>`;
+      }
+      if (m.type === 'editFechamento') {
+        const d = m.data;
+        content = `<h3 style="font-size:16px;font-weight:700;margin-bottom:18px">Editar Rota — Base ${d.base}</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px">
+          <div class="form-group"><label>Data</label><input type="date" id="eFechData" value="${d.data}"></div>
+          <div class="form-group"><label>Motorista</label><input type="text" id="eFechMotorista" list="dlMotoristas" value="${d.motorista || ''}" placeholder="Busque ou digite..."></div>
+          <div class="form-group"><label>Login</label><input type="text" id="eFechLogin" value="${d.login}"></div>
+          <datalist id="dlMotoristas">${STATE.motoristas.map(m => `<option value="${m.nome}">`).join('')}</datalist>
+          <div class="form-group"><label>Tipo de Veículo</label><select id="eFechVeiculo">${STATE.veiculos.map(v => `<option value="${v.tipo}"${d.veiculo === v.tipo ? ' selected' : ''}>${v.tipo}</option>`).join('')}</select></div>
+          <div class="form-group"><label>Cidade</label><select id="eFechCidade">${STATE.cidades.map(c => `<option value="${c.nome}"${d.cidade === c.nome ? ' selected' : ''}>${c.nome}</option>`).join('')}</select></div>
+          <div class="form-group"><label>Claster</label><input type="text" id="eFechCluster" value="${d.cluster || ''}"></div>
+           <div class="form-group"><label>Pedágio (R$)</label><input type="number" id="eFechPedagio" value="${d.pedagio}"></div>
+           <div class="form-group"><label>Adicional (R$)</label><input type="number" id="eFechAdicional" value="${d.adicional}"></div>
+           <div class="form-group"><label>Combustível (Desconto R$)</label><input type="number" id="eFechCombustivel" value="${d.combustivel}" style="border-color:var(--danger)"></div>
+           <div class="form-group"><label>Outros Descontos (R$)</label><input type="number" id="eFechDesconto" value="${d.desconto || 0}" style="border-color:var(--danger)"></div>
+           <div class="form-group" style="grid-column: span 2"><label>Justificativa do Desconto</label><input type="text" id="eFechJustificativa" value="${d.justificativa || ''}" placeholder="Obrigatório se houver desconto"></div>
+         </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+          <button class="btn-outline" id="btnCancelModal">Cancelar</button>
+          <button class="btn-primary" id="btnSalvarEditFech">Salvar Alterações</button>
+        </div>`;
+      }
+      if (m.type === 'loteFechamento') {
+        content = `<h3 style="font-size:16px;font-weight:700;margin-bottom:6px">Lançamento em Lote — Fechamento ${STATE.activeSubTab}</h3>
+        <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Formato esperado (Tabulado): <strong>[Data] [Tab] [Login] [Tab] [Cidade] [Tab] [Veiculo] [Tab] [Pedagio] [Tab] [Adic] [Tab] [Comb]</strong></p>
+        <textarea id="fAreaLoteFech" rows="10" placeholder="2025-04-23	login123	Campinas	UTILITARIOS	15.00	0	20.00" style="font-family:monospace;line-height:1.4; font-size:11px"></textarea>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+          <button class="btn-outline" id="btnCancelModal">Cancelar</button>
+          <button class="btn-success" id="btnProcessarLoteFech">Processar e Importar</button>
+        </div>`;
+      }
+      if (m.type === 'extratoMotorista') {
+        const nome = m.data.nome;
+        const allOps = ['amazon', 'mercado', 'petlove', 'shopee', 'outros'];
+        const todosLanc = [];
+        allOps.forEach(op => {
+          const key = 'lancamentos' + op.charAt(0).toUpperCase() + op.slice(1);
+          const list = STATE[key] || [];
+          list.filter(l => l.motorista === nome).forEach(l => {
+            todosLanc.push({...l, org: op.toUpperCase()});
+          });
+        });
+        todosLanc.sort((a,b) => b.data.localeCompare(a.data));
+        const totalGeral = todosLanc.reduce((s,l)=>s+l.valor,0);
+        const pgtos = STATE.contasPagar.filter(c => c.motorista === nome);
+        const totalPago = pgtos.filter(c=>c.status==='pago').reduce((s,c)=>s+c.valor,0);
+        const totalPend = pgtos.filter(c=>c.status==='pendente').reduce((s,c)=>s+c.valor,0);
+        const mot = STATE.motoristas.find(x => x.nome === nome);
+        content = `<h3 style="font-size:16px;font-weight:700;margin-bottom:4px">Extrato — ${nome}</h3>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:16px">${mot ? 'Base: '+(mot.baseAtrelada||'N/A')+' · PIX: '+(mot.pix||'N/D') : 'Motorista não cadastrado'}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+          <div style="background:#eff6ff;padding:10px;border-radius:8px;text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700">TOTAL LANÇADO</div><div style="font-size:16px;font-weight:800;color:var(--blue)">R$ ${totalGeral.toLocaleString('pt-BR')}</div></div>
+          <div style="background:#dcfce7;padding:10px;border-radius:8px;text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700">TOTAL PAGO</div><div style="font-size:16px;font-weight:800;color:var(--green)">R$ ${totalPago.toLocaleString('pt-BR')}</div></div>
+          <div style="background:#fef3c7;padding:10px;border-radius:8px;text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700">PENDENTE</div><div style="font-size:16px;font-weight:800;color:var(--yellow)">R$ ${totalPend.toLocaleString('pt-BR')}</div></div>
+        </div>
+        <div style="max-height:300px;overflow-y:auto">
+        <table style="font-size:12px"><thead><tr><th>Data</th><th>Origem</th><th>Base</th><th>Valor</th><th>Obs</th></tr></thead>
+        <tbody>${todosLanc.length === 0 ? '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:16px">Nenhum lançamento encontrado</td></tr>' : todosLanc.map(l => `<tr><td>${l.data}</td><td><span class="badge ${l.org==='Amazon'?'badge-blue':'badge-yellow'}">${l.org}</span></td><td>${l.base||'-'}</td><td style="font-weight:600;color:var(--blue)">R$ ${l.valor.toLocaleString('pt-BR')}</td><td style="font-size:11px;color:var(--text3)">${l.obs||'-'}</td></tr>`).join('')}
+        </tbody></table></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+          <button class="btn-outline" id="btnCancelModal">Fechar</button>
+        </div>`;
+      }
       return `<div class="modal-overlay" id="modalOverlay"><div class="modal ${m.large ? 'modal-lg' : ''}">${content}</div></div>`;
     }
 
@@ -1301,8 +1870,25 @@
       });
       document.getElementById('loginPass')?.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btnLogin')?.click(); });
       document.getElementById('btnLogout')?.addEventListener('click', () => { STATE.currentUser = null; STATE.view = 'login'; STATE.loginError = ''; STATE.loginEmail = ''; STATE.loginPass = ''; render(); });
-      document.querySelectorAll('.nav-item').forEach(btn => btn.addEventListener('click', () => { STATE.activeMenu = btn.dataset.menu; STATE.activeSubTab = ''; STATE.filters = { search: '', dataInicio: '', dataFim: '' }; render(); }));
-      document.querySelectorAll('[data-subtab]').forEach(btn => btn.addEventListener('click', () => { STATE.activeSubTab = btn.dataset.subtab; STATE.filters = { search: '', dataInicio: '', dataFim: '' }; render(); }));
+      document.querySelectorAll('.nav-item').forEach(btn => btn.addEventListener('click', () => { STATE.activeMenu = btn.dataset.menu; STATE.activeSubTab = ''; STATE.filters = { search: '', dataInicio: '', dataFim: '', base: '', origem: '' }; render(); }));
+      document.querySelectorAll('[data-dash-filter]').forEach(btn => btn.addEventListener('click', () => { STATE.dashboardFilter = btn.dataset.dashFilter; render(); }));
+      document.querySelectorAll('[data-subtab]').forEach(btn => btn.addEventListener('click', () => {
+        STATE.activeSubTab = btn.dataset.subtab; 
+        if (STATE.activeMenu === 'cadastros' && STATE.activeSubTab === 'motoristas') {
+          STATE.filters.opFilter = 'amazon';
+        }
+        STATE.filters.search = ''; STATE.filters.dataInicio = ''; STATE.filters.dataFim = ''; STATE.filters.base = ''; STATE.filters.origem = ''; render(); 
+      }));
+
+      document.querySelectorAll('[data-filter-op]').forEach(btn => btn.addEventListener('click', () => {
+        STATE.filters.opFilter = btn.dataset.filterOp;
+        render();
+      }));
+
+      document.getElementById('btnLimparFiltros')?.addEventListener('click', () => {
+        STATE.filters = { search: '', dataInicio: '', dataFim: '', base: '', origem: '', fechMotorista: '', fechLogin: '', opFilter: 'amazon' };
+        render();
+      });
 
       // Eventos de Filtro (Com correção de cursor)
       document.getElementById('filterSearch')?.addEventListener('input', e => { 
@@ -1313,15 +1899,33 @@
       });
       document.getElementById('filterStart')?.addEventListener('change', e => { STATE.filters.dataInicio = e.target.value; render(); });
       document.getElementById('filterEnd')?.addEventListener('change', e => { STATE.filters.dataFim = e.target.value; render(); });
+      document.getElementById('filterBaseFin')?.addEventListener('change', e => { STATE.filters.base = e.target.value; render(); });
+      document.getElementById('filterOrigemFin')?.addEventListener('change', e => { STATE.filters.origem = e.target.value; render(); });
+      
+      document.getElementById('filterFechMotorista')?.addEventListener('input', e => { 
+        const val = e.target.value;
+        STATE.filters.fechMotorista = (val === '[ VAZIO ]') ? 'vazio' : val; 
+        render();
+        const input = document.getElementById('filterFechMotorista');
+        if (input) { input.focus(); input.setSelectionRange(val.length, val.length); }
+      });
+
+      document.getElementById('filterFechLogin')?.addEventListener('input', e => { 
+        const val = e.target.value, pos = e.target.selectionStart;
+        STATE.filters.fechLogin = val; 
+        render();
+        const input = document.getElementById('filterFechLogin');
+        if (input) { input.focus(); input.setSelectionRange(pos, pos); }
+      });
 
       document.getElementById('chkAllFin')?.addEventListener('change', e => {
         document.querySelectorAll('.chk-fin').forEach(chk => chk.checked = e.target.checked);
-        document.getElementById('btnPagarMarcados').style.display = e.target.checked ? 'block' : 'none';
+        document.getElementById('btnPagarMarcados').style.display = e.target.checked ? 'inline-flex' : 'none';
       });
 
       document.querySelectorAll('.chk-fin').forEach(c => c.addEventListener('change', () => {
         const qtdVal = document.querySelectorAll('.chk-fin:checked').length;
-        document.getElementById('btnPagarMarcados').style.display = qtdVal > 0 ? 'block' : 'none';
+        document.getElementById('btnPagarMarcados').style.display = qtdVal > 0 ? 'inline-flex' : 'none';
       }));
 
       document.getElementById('btnPagarMarcados')?.addEventListener('click', () => {
@@ -1346,15 +1950,218 @@
       document.getElementById('btnNovoLanc')?.addEventListener('click', e => { STATE.modal = { type: 'novoLanc', tipo: e.target.dataset.tipo }; render(); });
       document.getElementById('btnLoteLanc')?.addEventListener('click', e => { STATE.modal = { type: 'loteLanc', tipo: e.target.dataset.tipo }; render(); });
       document.getElementById('btnNovoFunc')?.addEventListener('click', () => { STATE.modal = { type: 'novoFunc' }; render(); });
-      document.getElementById('btnNovoCad')?.addEventListener('click', e => { const t = e.target.dataset.tipo; if (t === 'motoristas') STATE.modal = { type: 'novoMotorista' }; else if (t === 'bases') STATE.modal = { type: 'novoBase' }; else if (t === 'cidades') STATE.modal = { type: 'novoCidade' }; else if (t === 'veiculos') STATE.modal = { type: 'novoVeiculo' }; render(); });
+      document.getElementById('btnNovoCad')?.addEventListener('click', e => { const t = e.target.dataset.tipo; if (t === 'motoristas') STATE.modal = { type: 'novoMotorista' }; else if (t === 'bases') STATE.modal = { type: 'novoBase' }; else if (t === 'cidades') STATE.modal = { type: 'novoCidade' }; else if (t === 'veiculos') STATE.modal = { type: 'novoVeiculo' }; else if (t === 'precos') STATE.modal = { type: 'novoPreco' }; render(); });
       document.getElementById('btnNovoUser')?.addEventListener('click', () => { STATE.modal = { type: 'novoUser' }; render(); });
       document.getElementById('btnNovoContr')?.addEventListener('click', () => { STATE.modal = { type: 'novoContrato' }; render(); });
+
+      document.querySelectorAll('[data-edit-preco]').forEach(btn => btn.addEventListener('click', () => { const p = STATE.tabelaPrecos.find(x => x.id === parseFloat(btn.dataset.editPreco)); STATE.modal = { type: 'editPreco', id: p.id, data: { ...p } }; render(); }));
+      document.querySelectorAll('[data-del-preco]').forEach(btn => btn.addEventListener('click', () => { const id = parseFloat(btn.dataset.delPreco); STATE.modal = { type: 'confirm', title: 'Excluir Preço', message: 'Tem certeza que deseja excluir esta configuração de preço?', onConfirm: () => { const idx = STATE.tabelaPrecos.findIndex(x => x.id === id); if (idx >= 0) STATE.tabelaPrecos.splice(idx, 1); STATE.modal = null; render(); } }; render(); }));
+
+      document.getElementById('btnSalvarPreco')?.addEventListener('click', () => {
+        const m = STATE.modal, base = document.getElementById('fPrecoBase').value, veiculo = document.getElementById('fPrecoVei').value, cidade = document.getElementById('fPrecoCid').value, valor = parseFloat(document.getElementById('fPrecoValor').value) || 0;
+        if (!base || !cidade || valor <= 0) return alert('Preencha todos os campos corretamente.');
+        if (m.type === 'novoPreco') { STATE.tabelaPrecos.push({ id: Date.now(), base, veiculo, cidade, valor }); addLog(`Configurou preço de rota: ${base} - ${veiculo} - ${cidade}`); }
+        else { Object.assign(STATE.tabelaPrecos.find(x => x.id === m.id), { base, veiculo, cidade, valor }); addLog(`Editou preço de rota: ${base}`); }
+        STATE.modal = null; render();
+      });
+
+      // --- EVENTOS FECHAMENTO ---
+      const updateFechCalc = () => {
+        const v = document.getElementById('fFechVeiculo')?.value;
+        const c = document.getElementById('fFechCidade')?.value;
+        const r = getPrecoRota(STATE.activeSubTab, v, c);
+        const p = parseFloat(document.getElementById('fFechPedagio')?.value || 0);
+        const a = parseFloat(document.getElementById('fFechAdicional')?.value || 0);
+        const cb = parseFloat(document.getElementById('fFechCombustivel')?.value || 0);
+        const desc = parseFloat(document.getElementById('fFechDesconto')?.value || 0);
+        
+        const rotaInput = document.getElementById('fFechRota');
+        if (rotaInput) rotaInput.value = r;
+        
+        const totalInput = document.getElementById('fFechTotal');
+        if (totalInput) totalInput.value = (r + p + a - cb - desc).toFixed(2);
+      };
+
+      document.getElementById('fFechVeiculo')?.addEventListener('change', updateFechCalc);
+      document.getElementById('fFechCidade')?.addEventListener('change', updateFechCalc);
+      ['fFechPedagio', 'fFechAdicional', 'fFechCombustivel', 'fFechDesconto'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', updateFechCalc);
+      });
+
+
+      document.getElementById('btnLoteFech')?.addEventListener('click', () => { STATE.modal = { type: 'loteFechamento' }; render(); });
+
+      document.getElementById('btnAddRotaFech')?.addEventListener('click', () => {
+        const data = document.getElementById('fFechData').value;
+        const motorista = document.getElementById('fFechMotorista').value;
+        const login = document.getElementById('fFechLogin').value;
+        const veiculo = document.getElementById('fFechVeiculo').value;
+        const cidade = document.getElementById('fFechCidade').value;
+        const cluster = document.getElementById('fFechCluster').value;
+        const rota = parseFloat(document.getElementById('fFechRota').value || 0);
+        const pedagio = parseFloat(document.getElementById('fFechPedagio').value || 0);
+        const adicional = parseFloat(document.getElementById('fFechAdicional').value || 0);
+        const combustivel = parseFloat(document.getElementById('fFechCombustivel').value || 0);
+        const desconto = parseFloat(document.getElementById('fFechDesconto').value || 0);
+        const justificativa = document.getElementById('fFechJustificativa').value.trim();
+        const total = rota + pedagio + adicional - combustivel - desconto;
+
+        if (!veiculo || !cidade) {
+            STATE.modal = { type: 'alert', title: 'Campo Obrigatório', message: 'Por favor, selecione pelo menos o Veículo e a Cidade.' };
+            render(); return;
+        }
+        if (desconto > 0 && !justificativa) {
+            STATE.modal = { type: 'alert', title: 'Justificativa Necessária', message: 'Por favor, informe o motivo do desconto no campo de justificativa.' };
+            render(); return;
+        }
+
+        STATE.lancamentosFechamento.push({
+            id: Date.now(), data, motorista, login, veiculo, cidade, cluster,
+            rota, pedagio, adicional, combustivel, desconto, justificativa, total,
+            base: STATE.activeSubTab
+        });
+        addLog(`Adicionou rota para ${motorista} na base ${STATE.activeSubTab}`);
+        render();
+      });
+
+      document.getElementById('btnEnviarSupervisao')?.addEventListener('click', () => {
+        const activeBase = STATE.activeSubTab;
+        const listaFiltrada = STATE.lancamentosFechamento.filter(l => {
+          if (l.base !== activeBase) return false;
+          const matchStart = !STATE.filters.dataInicio || l.data >= STATE.filters.dataInicio;
+          const matchEnd = !STATE.filters.dataFim || l.data <= STATE.filters.dataFim;
+          return matchStart && matchEnd;
+        });
+
+        if (listaFiltrada.length === 0) return;
+
+        const temVazio = listaFiltrada.some(l => !l.motorista);
+        if (temVazio) {
+            STATE.modal = { type: 'alert', title: 'Motorista Ausente', message: 'Existem registros filtrados que não possuem um motorista associado. Por favor, utilize a função <b>Editar</b> para preenchê-los antes de enviar à Supervisão.' };
+            render(); return;
+        }
+
+        STATE.modal = {
+          type: 'confirm',
+          title: 'Enviar para Supervisão',
+          message: `Confirma o envio de <b>${listaFiltrada.length} registros</b> da base <b>${activeBase}</b> para a Supervisão (Aba Amazon)?<br><br>Os valores serão consolidados por motorista e os registros atuais serão arquivados.`,
+          onConfirm: () => {
+            const porMotorista = {};
+            listaFiltrada.forEach(l => {
+              if (!porMotorista[l.motorista]) porMotorista[l.motorista] = 0;
+              porMotorista[l.motorista] += l.total;
+            });
+
+            const hoje = today();
+            Object.entries(porMotorista).forEach(([nome, valorTotal]) => {
+              const mot = STATE.motoristas.find(m => m.nome === nome);
+              const existe = STATE.lancamentosAmazon.find(l => l.motorista === nome && l.base === activeBase && !l.enviado);
+              
+              if (existe) {
+                existe.valor += valorTotal;
+                existe.obs = (existe.obs ? existe.obs + ' + ' : '') + 'Reforço de fechamento';
+              } else {
+                STATE.lancamentosAmazon.unshift({
+                  id: Date.now() + Math.random(),
+                  data: hoje,
+                  motorista: nome,
+                  pix: mot?.pix || '',
+                  favorecido: mot?.favorecido || nome,
+                  valor: valorTotal,
+                  base: activeBase,
+                  criadoPor: STATE.currentUser.name,
+                  criadoEm: hoje,
+                  enviado: false
+                });
+              }
+            });
+
+            const idsToRemove = listaFiltrada.map(l => l.id);
+            STATE.lancamentosFechamento = STATE.lancamentosFechamento.filter(l => !idsToRemove.includes(l.id));
+
+            addLog(`Enviou fechamento da base ${activeBase} para supervisão.`);
+            STATE.modal = { type: 'alert', title: '🚀 Enviado!', message: 'Os dados foram consolidados e enviados para aprovação na aba Amazon.' };
+            render();
+          }
+        };
+        render();
+      });
+
+      document.querySelectorAll('[data-del-fech]').forEach(btn => btn.addEventListener('click', () => {
+        const id = parseFloat(btn.dataset.delFech);
+        STATE.lancamentosFechamento = STATE.lancamentosFechamento.filter(l => l.id !== id);
+        render();
+      }));
+
+      document.querySelectorAll('[data-edit-fech]').forEach(btn => btn.addEventListener('click', () => {
+        const id = parseFloat(btn.dataset.editFech);
+        const item = STATE.lancamentosFechamento.find(l => l.id === id);
+        STATE.modal = { type: 'editFechamento', data: item };
+        render();
+      }));
+
+      document.getElementById('btnSalvarEditFech')?.addEventListener('click', () => {
+        const item = STATE.modal.data;
+        const data = document.getElementById('eFechData').value;
+        const motorista = document.getElementById('eFechMotorista').value;
+        const login = document.getElementById('eFechLogin').value;
+        const veiculo = document.getElementById('eFechVeiculo').value;
+        const cidade = document.getElementById('eFechCidade').value;
+        const cluster = document.getElementById('eFechCluster').value;
+        const pedagio = parseFloat(document.getElementById('eFechPedagio').value || 0);
+        const adicional = parseFloat(document.getElementById('eFechAdicional').value || 0);
+        const combustivel = parseFloat(document.getElementById('eFechCombustivel').value || 0);
+        const desconto = parseFloat(document.getElementById('eFechDesconto').value || 0);
+        const justificativa = document.getElementById('eFechJustificativa').value.trim();
+        
+        if (desconto > 0 && !justificativa) {
+            STATE.modal = { type: 'alert', title: 'Justificativa Necessária', message: 'Por favor, informe o motivo do desconto no campo de justificativa.' };
+            render(); return;
+        }
+
+        const rota = getPrecoRota(item.base, veiculo, cidade);
+        const total = rota + pedagio + adicional - combustivel - desconto;
+
+        Object.assign(item, { data, motorista, login, veiculo, cidade, cluster, pedagio, adicional, combustivel, desconto, justificativa, rota, total });
+        STATE.modal = null;
+        render();
+      });
+
+      document.getElementById('btnProcessarLoteFech')?.addEventListener('click', () => {
+        const txt = document.getElementById('fAreaLoteFech').value.trim();
+        if (!txt) return;
+        let count = 0;
+        txt.split('\n').forEach((linha, idx) => {
+          const partes = linha.trim().split(/\t/);
+          if (partes.length >= 4) {
+            const data = partes[0].trim();
+            const login = partes[1].trim();
+            const cidade = partes[2].trim();
+            const veiculo = partes[3].trim();
+            const pedagio = parseFloat(partes[4] || 0);
+            const adicional = parseFloat(partes[5] || 0);
+            const combustivel = parseFloat(partes[6] || 0);
+            const desconto = parseFloat(partes[7] || 0);
+            const rota = getPrecoRota(STATE.activeSubTab, veiculo, cidade);
+            const total = rota + pedagio + adicional - combustivel - desconto;
+            
+            STATE.lancamentosFechamento.push({
+              id: Date.now() + idx, data, motorista: '', login, veiculo, cidade, cluster: '',
+              rota, pedagio, adicional, combustivel, desconto, justificativa: '', total,
+              base: STATE.activeSubTab
+            });
+            count++;
+          }
+        });
+        STATE.modal = { type: 'alert', title: 'Lote Importado', message: `${count} registros importados. Agora você pode editá-los para associar os motoristas.` };
+        render();
+      });
 
       document.getElementById('fMotoristaTop')?.addEventListener('change', e => {
         const moto = STATE.motoristas.find(x => x.nome === e.target.value);
         if (moto) {
           const p = document.getElementById('fPixAssoc'); if (p) p.value = moto.pix || '';
-          const f = document.getElementById('fFavAssoc'); if (f) f.value = moto.nome;
+          const f = document.getElementById('fFavAssoc'); if (f) f.value = moto.favorecido || moto.nome;
         }
       });
 
@@ -1382,37 +2189,43 @@
       }));
 
       document.getElementById('btnSalvarUnico')?.addEventListener('click', () => {
-        const m = STATE.modal, data = document.getElementById('fDataOp').value, motorista = document.getElementById('fMotoristaTop').value, pix = document.getElementById('fPixAssoc').value, favorecido = document.getElementById('fFavAssoc').value, valor = parseFloat(document.getElementById('fValorLivre').value) || 0, base = document.getElementById('fBaseLivre').value;
+        const m = STATE.modal, data = document.getElementById('fDataOp').value, motorista = document.getElementById('fMotoristaTop').value, pix = document.getElementById('fPixAssoc').value, favorecido = document.getElementById('fFavAssoc').value, valor = parseFloat(document.getElementById('fValorLivre').value) || 0, base = document.getElementById('fBaseLivre').value, obs = (document.getElementById('fObsLivre')?.value || '').trim();
         if (!data || !motorista || valor <= 0) { STATE.modal = { type: 'alert', message: 'Preencha Data, Motorista e um Valor válido em R$.' }; render(); return; }
-        const lista = m.tipo === 'amazon' ? STATE.lancamentosAmazon : STATE.lancamentosMercado;
-        lista.push({ id: Date.now(), data, motorista, pix, favorecido, valor, base, criadoPor: STATE.currentUser.name, criadoEm: today(), enviado: false });
-        addLog(`Cadastrou lançamento direto ${m.tipo === 'amazon' ? 'Amazon' : 'Mercado Livre'} de R$ ${valor} para ${motorista}`);
+        const key = 'lancamentos' + m.tipo.charAt(0).toUpperCase() + m.tipo.slice(1);
+        const lista = STATE[key];
+        if (!lista) return;
+        lista.push({ id: Date.now(), data, motorista, pix, favorecido, valor, base, obs, criadoPor: STATE.currentUser.name, criadoEm: today(), enviado: false });
+        addLog(`Cadastrou lançamento direto ${m.tipo.toUpperCase()} de R$ ${valor} para ${motorista}`);
         STATE.modal = null; render();
       });
 
       document.getElementById('btnProcessarLote')?.addEventListener('click', () => {
         const m = STATE.modal, txt = document.getElementById('fAreaLote').value.trim(), dataLote = document.getElementById('fDataLote').value;
         if (!txt || !dataLote) { STATE.modal = { type: 'alert', message: 'Preencha os campos e cole os dados corretamente na caixa de texto central.' }; render(); return; }
-        const lista = m.tipo === 'amazon' ? STATE.lancamentosAmazon : STATE.lancamentosMercado;
+        const key = 'lancamentos' + m.tipo.charAt(0).toUpperCase() + m.tipo.slice(1);
+        const lista = STATE[key];
+        if (!lista) return;
         let count = 0;
         txt.split('\n').forEach((linha, idx) => {
           const partes = linha.trim().split(/\t|\s{2,}/);
             if (partes.length >= 2) {
               const nome = partes[0].trim(), valor = parseFloat(partes[1].replace(',', '.').replace(/[^0-9.]/g, '')) || 0, base = partes[2] ? partes[2].trim().toUpperCase() : 'N/A';
               if (nome && valor > 0) {
-                const mot = STATE.motoristas.find(x => x.nome.toLowerCase() === nome.toLowerCase()) || { pix: 'Não localizado', nome: nome };
-                lista.push({ id: Date.now() + idx, data: dataLote, motorista: nome, pix: mot.pix || 'S/ PIX', favorecido: mot.nome, valor, base, criadoPor: STATE.currentUser.name + ' (Lote)', criadoEm: today(), enviado: false });
+                const mot = STATE.motoristas.find(x => x.nome.toLowerCase() === nome.toLowerCase()) || { pix: 'Não localizado', nome: nome, favorecido: '' };
+                lista.push({ id: Date.now() + idx, data: dataLote, motorista: nome, pix: mot.pix || 'S/ PIX', favorecido: mot.favorecido || mot.nome, valor, base, criadoPor: STATE.currentUser.name + ' (Lote)', criadoEm: today(), enviado: false });
                 count++;
               }
             }
         });
-        addLog(`Importou ${count} lançamentos locais em lote (${m.tipo === 'amazon' ? 'Amazon' : 'Mercado Livre'})`);
+        addLog(`Importou ${count} lançamentos locais em lote (${m.tipo.toUpperCase()})`);
         STATE.modal = { type: 'alert', title: 'Lote Processado', message: `Lote processado com sucesso!<br>${count} registros salvos localmente nesta sessão (Aguardam autorização de envio do Supervisor).` }; render();
       });
 
       document.getElementById('btnEnviarFinOp')?.addEventListener('click', e => {
         const tipo = e.target.dataset.tipo;
-        const lista = tipo === 'amazon' ? STATE.lancamentosAmazon : STATE.lancamentosMercado;
+        const key = 'lancamentos' + tipo.charAt(0).toUpperCase() + tipo.slice(1);
+        const lista = STATE[key];
+        if (!lista) return;
         const pendentes = lista.filter(x => !x.enviado);
         if (pendentes.length === 0) return;
         STATE.modal = {
@@ -1420,7 +2233,7 @@
             pendentes.forEach((l, i) => {
               l.enviado = true;
               l.contaId = Date.now() + i;
-              STATE.contasPagar.push({ id: l.contaId, motorista: l.motorista, semana: l.data.slice(0, 7), valor: l.valor, pix: l.pix, status: 'pendente', dataPagamento: null, pagoBy: null, origem: tipo });
+              STATE.contasPagar.push({ id: l.contaId, motorista: l.motorista, base: l.base, favorecido: l.favorecido, semana: l.data.slice(0, 7), valor: l.valor, pix: l.pix, status: 'pendente', dataPagamento: null, pagoBy: null, origem: tipo });
             });
             addLog(`Supervisor enviou pacote de ${pendentes.length} pendências do ${tipo} para Caixa Geral`);
             STATE.modal = { type: 'alert', title: 'Tudo Certo!', message: `Sucesso! Foram abertas ${pendentes.length} contas a pagar vinculadas no painel do Financeiro Central.` }; render();
@@ -1439,12 +2252,151 @@
         const id = parseFloat(btn.dataset.pagar), c = STATE.contasPagar.find(x => x.id === id);
         STATE.modal = { type: 'confirm', title: 'Confirmar Pagamento', message: `Marcar pagamento de <strong>R$ ${c.valor.toLocaleString('pt-BR')}</strong> para <strong>${c.motorista}</strong> como pago?`, onConfirm: () => { c.status = 'pago'; c.dataPagamento = today(); c.pagoBy = STATE.currentUser.name; addLog(`Marcou pagamento de ${c.motorista} (${c.semana}) como pago — R$ ${c.valor.toLocaleString('pt-BR')}`); STATE.modal = null; render(); } }; render();
       }));
-      document.getElementById('btnConfirmAction')?.addEventListener('click', () => STATE.modal?.onConfirm?.());
+      document.getElementById('btnConfirmAction')?.addEventListener('click',()=>STATE.modal?.onConfirm?.());
+  
+  // Evento Gerar Arquivos Motoristas (PDF/ZIP)
+  document.getElementById('btnGerarArquivosMot')?.addEventListener('click', async () => {
+    const { jsPDF } = window.jspdf;
+    const zip = new JSZip();
+    const activeBase = STATE.activeSubTab;
+    const dataIni = STATE.filters.dataInicio;
+    const dataFim = STATE.filters.dataFim;
+
+    if (!dataIni || !dataFim) {
+      alert("Por favor, selecione um período (Início e Fim) para gerar os arquivos.");
+      return;
+    }
+
+    const lancamentos = STATE.lancamentosFechamento.filter(l => 
+      l.base === activeBase && l.data >= dataIni && l.data <= dataFim && l.motorista
+    );
+
+    if (lancamentos.length === 0) {
+      alert("Nenhum lançamento com motorista encontrado no período selecionado.");
+      return;
+    }
+
+    // Agrupar por motorista
+    const porMotorista = {};
+    lancamentos.forEach(l => {
+      if (!porMotorista[l.motorista]) porMotorista[l.motorista] = [];
+      porMotorista[l.motorista].push(l);
+    });
+
+    const btn = document.getElementById('btnGerarArquivosMot');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "⏳ Processando...";
+    btn.disabled = true;
+
+    try {
+      for (const motorista in porMotorista) {
+        const doc = new jsPDF();
+        const records = porMotorista[motorista];
+        const totalMot = records.reduce((s, r) => s + r.total, 0);
+        const motoristaInfo = STATE.motoristas.find(m => m.nome === motorista);
+
+        // Cabeçalho do PDF
+        doc.setFontSize(18);
+        doc.setTextColor(30, 64, 175);
+        doc.text("Espelho de Repasse Operacional", 14, 20);
+        
+        doc.setFontSize(12);
+        doc.setTextColor(100);
+        doc.text(`Motorista: ${motorista}`, 14, 30);
+        doc.text(`Base: ${activeBase}`, 14, 37);
+        doc.text(`Período: ${dataIni.split('-').reverse().join('/')} até ${dataFim.split('-').reverse().join('/')}`, 14, 44);
+
+        // Tabela de Rotas
+        const tableData = records.map(r => [
+          r.data.split('-').reverse().join('/'),
+          r.login,
+          r.veiculo,
+          r.cidade,
+          `R$ ${r.rota.toLocaleString('pt-BR')}`,
+          `R$ ${r.pedagio.toLocaleString('pt-BR')}`,
+          `R$ ${r.adicional.toLocaleString('pt-BR')}`,
+          `- R$ ${r.combustivel.toLocaleString('pt-BR')}`,
+          `- R$ ${(r.desconto || 0).toLocaleString('pt-BR')}`,
+          `R$ ${r.total.toLocaleString('pt-BR')}`
+        ]);
+
+        doc.autoTable({
+          startY: 55,
+          head: [['Data', 'Login', 'Veículo', 'Cidade', 'Rota', 'Ped.', 'Adic.', 'Comb.', 'Desc.', 'Total']],
+          body: tableData,
+          theme: 'striped',
+          headStyles: { fillColor: [30, 64, 175] },
+          styles: { fontSize: 8 },
+          margin: { top: 50 }
+        });
+
+        // Detalhamento de Descontos
+        let currentY = doc.lastAutoTable.finalY + 15;
+        const descontosJustificados = records.filter(r => r.desconto > 0 && r.justificativa);
+        
+        if (descontosJustificados.length > 0) {
+          doc.setFontSize(11);
+          doc.setTextColor(185, 28, 28); // Red
+          doc.text("Detalhamento de Descontos:", 14, currentY);
+          currentY += 6;
+          doc.setFontSize(9);
+          doc.setTextColor(80);
+          descontosJustificados.forEach(dj => {
+            doc.text(`• Dia ${dj.data.split('-').reverse().join('/')}: R$ ${dj.desconto.toLocaleString('pt-BR')} - Motivo: ${dj.justificativa}`, 16, currentY);
+            currentY += 5;
+          });
+          currentY += 5;
+        }
+
+        // Rodapé com Total e PIX
+        doc.setFontSize(14);
+        doc.setTextColor(0);
+        doc.text(`VALOR TOTAL A RECEBER: R$ ${totalMot.toLocaleString('pt-BR')}`, 14, currentY);
+        currentY += 10;
+        
+        doc.setFontSize(11);
+        doc.setTextColor(30, 64, 175);
+        doc.text(`CHAVE PIX PARA PAGAMENTO: ${motoristaInfo?.pix || 'NÃO CADASTRADA'}`, 14, currentY);
+        currentY += 6;
+        doc.setFontSize(9);
+        doc.setTextColor(100);
+        doc.text(`Favorecido: ${motoristaInfo?.favorecido || motorista}`, 14, currentY);
+        currentY += 12;
+
+        doc.setFontSize(9);
+        doc.setTextColor(150);
+        doc.text("Este documento é um espelho para conferência. Em caso de divergência, procure seu supervisor.", 14, currentY);
+        doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 14, currentY + 6);
+
+        // Adicionar ao ZIP
+        const pdfBlob = doc.output('blob');
+        zip.file(`${motorista.replace(/ /g, '_')}.pdf`, pdfBlob);
+      }
+
+      const content = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(content);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Fechamento_${activeBase}_${dataIni}_a_${dataFim}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      alert("Arquivos gerados com sucesso!");
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao gerar arquivos.");
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  });
+
       document.getElementById('btnEnviarFolha')?.addEventListener('click', () => {
         STATE.modal = {
           type: 'confirm', title: 'Enviar Folha ao Financeiro', message: 'Confirma o envio da folha do mês selecionado (' + STATE.folhaMesFiltro + ') ao Financeiro?', onConfirm: () => {
             const m = STATE.folhaMesFiltro;
             let count = 0;
+            // ... (rest of the file content remains unchanged)
             STATE.funcionarios.filter(f => f.status === 'ativo').forEach(f => {
               const desc = Number(STATE.descontosMesAtual[f.id] || 0);
               const total = f.salario + f.vt - desc;
@@ -1489,13 +2441,13 @@
       });
 
       document.getElementById('btnSalvarMot')?.addEventListener('click', () => {
-        const m = STATE.modal, nome = document.getElementById('fNome').value.trim(), telefone = document.getElementById('fTel').value.trim(), cidade = document.getElementById('fCidadeBase').value, baseAtrelada = document.getElementById('fBaseAtrelada').value, veiculo = document.getElementById('fVeiculoPad').value, pix = document.getElementById('fPix').value.trim(), status = document.getElementById('fStatus').value;
+        const m = STATE.modal, nome = document.getElementById('fNome').value.trim(), operacao = document.getElementById('fOperacaoMot').value, telefone = document.getElementById('fTel').value.trim(), cidade = document.getElementById('fCidadeBase').value, baseAtrelada = document.getElementById('fBaseAtrelada').value, veiculo = document.getElementById('fVeiculoPad').value, pix = document.getElementById('fPix').value.trim(), favorecido = document.getElementById('fFavorecidoMot').value.trim(), status = document.getElementById('fStatus').value;
         if (!nome) return quickAlert('O nome do motorista precisa ser informado e válido.');
         const fileInput = document.getElementById('fMotContrato');
         let contratoUrl = m.data?.contratoUrl || '';
         if (fileInput && fileInput.files.length > 0) contratoUrl = URL.createObjectURL(fileInput.files[0]);
-        if (m.type === 'novoMotorista') { STATE.motoristas.push({ id: Date.now(), nome, telefone, cidade, baseAtrelada, veiculo, pix, status, contratoUrl }); addLog(`Cadastrou motorista: ${nome}`); }
-        else { Object.assign(STATE.motoristas.find(x => x.id === m.id), { nome, telefone, cidade, baseAtrelada, veiculo, pix, status, contratoUrl }); addLog(`Editou motorista: ${nome}`); }
+        if (m.type === 'novoMotorista') { STATE.motoristas.push({ id: Date.now(), nome, operacao, telefone, cidade, baseAtrelada, veiculo, pix, favorecido, status, contratoUrl }); addLog(`Cadastrou motorista: ${nome} (${operacao.toUpperCase()})`); }
+        else { Object.assign(STATE.motoristas.find(x => x.id === m.id), { nome, operacao, telefone, cidade, baseAtrelada, veiculo, pix, favorecido, status, contratoUrl }); addLog(`Editou motorista: ${nome}`); }
         STATE.modal = null; render();
       });
       document.getElementById('btnSalvarBase')?.addEventListener('click', () => {
@@ -1521,9 +2473,11 @@
       });
       document.getElementById('btnSalvarUser')?.addEventListener('click', () => {
         const m = STATE.modal, name = document.getElementById('fUserName').value.trim(), email = document.getElementById('fUserEmail').value.trim(), pass = document.getElementById('fUserPass').value, role = document.getElementById('fUserRole').value, active = document.getElementById('fUserStatus').value === '1';
+        const permissions = Array.from(document.querySelectorAll('.fUserPerm:checked')).map(cb => cb.value);
+        
         if (!name || !email) return quickAlert('Preencha as informações obrigatórias.');
-        if (m.type === 'novoUser') { if (!pass) return quickAlert('Dê uma senha ao novo usuário.'); STATE.users.push({ id: Date.now(), name, email, password: pass, role, active, createdAt: today() }); addLog(`Criou usuário: ${name}`); }
-        else { const u = STATE.users.find(x => x.id === m.id); Object.assign(u, { name, email, role, active }); if (pass) u.password = pass; addLog(`Editou usuário: ${name}`); }
+        if (m.type === 'novoUser') { if (!pass) return quickAlert('Dê uma senha ao novo usuário.'); STATE.users.push({ id: Date.now(), name, email, password: pass, role, active, permissions, createdAt: today() }); addLog(`Criou usuário: ${name}`); }
+        else { const u = STATE.users.find(x => x.id === m.id); Object.assign(u, { name, email, role, active, permissions }); if (pass) u.password = pass; addLog(`Editou usuário: ${name}`); }
         STATE.modal = null; render();
       });
       document.getElementById('btnSalvarFunc')?.addEventListener('click', () => {
@@ -1542,7 +2496,7 @@
         STATE.users.find(x => x.id === m.data.id).password = nova; addLog(`Redefiniu senha do usuário: ${m.data.name}`); STATE.modal = null; alert('Senha redefinida!'); render();
       });
       document.getElementById('btnExportProd')?.addEventListener('click', () => { const rows = [['Data', 'Motorista', 'PIX', 'Favorecido', 'Valor', 'Origem']];[...STATE.lancamentosAmazon, ...STATE.lancamentosMercado].forEach(l => rows.push([l.data, l.motorista, l.pix, l.favorecido, l.valor, l.criadoPor.includes('Amazon') ? 'Amazon' : 'Mercado Livre'])); exportCSV(rows, 'lancamentos_hist.csv'); });
-      document.getElementById('btnExportFin')?.addEventListener('click', () => { const rows = [['Motorista', 'Semana', 'Valor', 'Chave PIX', 'Status', 'Data Pagamento', 'Pago por']]; STATE.contasPagar.forEach(c => rows.push([c.motorista, c.semana, c.valor, c.pix, c.status, c.dataPagamento || '', c.pagoBy || ''])); exportCSV(rows, 'financeiro.csv'); });
+      document.getElementById('btnExportFin')?.addEventListener('click', () => { const rows = [['Motorista', 'Semana', 'Base', 'Valor', 'Chave PIX', 'Favorecido', 'Status', 'Data Pagamento', 'Pago por']]; STATE.contasPagar.forEach(c => rows.push([c.motorista, c.semana, c.base || '', c.valor, c.pix, c.favorecido || '', c.status, c.dataPagamento || '', c.pagoBy || ''])); exportCSV(rows, 'financeiro.csv'); });
       document.getElementById('btnExportRH')?.addEventListener('click', () => { const rows = [['Funcionário', 'Cargo', 'Salário', 'VT', 'Desconto', 'Total Mensal']]; STATE.funcionarios.filter(f => f.status === 'ativo').forEach(f => rows.push([f.nome, f.cargo, f.salario, f.vt, Number(STATE.descontosMesAtual[f.id] || 0), f.salario + f.vt - Number(STATE.descontosMesAtual[f.id] || 0)])); exportCSV(rows, 'folha_rh_deducoes.csv'); });
     }
 
@@ -1553,6 +2507,77 @@
     }
 
     render();
+
+    // ── Dark Mode ──
+    const savedDark = localStorage.getItem('opscontrol_dark') === '1';
+    if (savedDark) document.body.classList.add('dark');
+    document.addEventListener('click', e => {
+      if (e.target.id === 'btnDarkMode') {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('opscontrol_dark', document.body.classList.contains('dark') ? '1' : '0');
+        render();
+      }
+    });
+
+    // ── Sessão por inatividade (30 min) ──
+    let _idleTimer;
+    const IDLE_MS = 30 * 60 * 1000;
+    function resetIdle() {
+      clearTimeout(_idleTimer);
+      if (STATE.view !== 'app') return;
+      _idleTimer = setTimeout(() => {
+        STATE.currentUser = null; STATE.view = 'login';
+        STATE.loginError = 'Sessão encerrada por inatividade (30 min).';
+        render();
+      }, IDLE_MS);
+    }
+    ['mousemove','keydown','click','scroll','touchstart'].forEach(ev => document.addEventListener(ev, resetIdle, true));
+    resetIdle();
+
+    // ── Tour Guiado / Onboarding ──
+    function startTour() {
+      const steps = [
+        { title: 'Bem-vindo ao OpsControl! \ud83d\ude80', msg: 'Este é o sistema de controle de pagamentos da Morais Transportes. Vou te mostrar as funcionalidades principais.' },
+        { title: '\ud83d\udcca Dashboard', msg: 'Aqui você vê a visão geral: movimentação total, pagamentos pendentes, eficiência e gráficos de evolução mensal.' },
+        { title: '\ud83d\udce6 Amazon e Mercado Livre', msg: 'Nos módulos de operação, você lança pagamentos para motoristas. Pode lançar individual ou em lote (colar da planilha).' },
+        { title: '\ud83d\udcb0 Financeiro', msg: 'Aqui o financeiro visualiza todas as contas a pagar, filtra por base e realiza pagamentos individualmente ou em lote.' },
+        { title: '\ud83d\udc65 Cadastros', msg: 'Gerencie motoristas, bases, cidades e veículos. Cadastre novos ou edite os existentes a qualquer momento.' },
+        { title: '\ud83d\udcc4 Relatórios', msg: 'Gere relatórios detalhados de produção, custos por base e financeiro. Exporte em CSV para Excel.' },
+        { title: '\ud83c\udf19 Modo Escuro', msg: 'Ative o modo escuro clicando no botão na barra lateral, abaixo do seu nome. A preferência é salva automaticamente.' },
+        { title: 'Pronto! \u2705', msg: 'Você já pode começar a usar o sistema. Se precisar rever o tour, acesse Administração > Tour Guiado.' },
+      ];
+      let idx = 0;
+      function showStep() {
+        const s = steps[idx];
+        STATE.modal = { type: 'alert', title: s.title + ' (' + (idx+1) + '/' + steps.length + ')', message: s.msg };
+        render();
+        const okBtn = document.getElementById('btnCancelModal');
+        if (okBtn) {
+          okBtn.textContent = idx < steps.length - 1 ? 'Próximo \u2192' : 'Finalizar Tour';
+          okBtn.onclick = (e) => { e.stopPropagation(); idx++; if (idx < steps.length) showStep(); else { STATE.modal = null; render(); localStorage.setItem('opscontrol_tour_done','1'); } };
+        }
+      }
+      showStep();
+    }
+    // Auto-trigger tour on first login
+    const origRender = render;
+    let _tourChecked = false;
+    render = function() {
+      origRender();
+      if (!_tourChecked && STATE.view === 'app' && STATE.currentUser) {
+        _tourChecked = true;
+        if (!localStorage.getItem('opscontrol_tour_done')) {
+          setTimeout(startTour, 500);
+        }
+      }
+      // Attach extrato motorista buttons
+      document.querySelectorAll('[data-extrato-mot]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          STATE.modal = { type: 'extratoMotorista', data: { nome: btn.dataset.extratoMot }, large: true };
+          render();
+        });
+      });
+    };
   </script>
 </body>
 
